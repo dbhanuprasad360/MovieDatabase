@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import CardShow from "./CardShow";
-import axios from "axios";
 import Pagination from "./Pagination";
 import Banner from "./Banner";
+import usePaginatedFetch from "../Hooks/usePaginatedFetch";
 
 const categories = [
   {
@@ -24,48 +24,27 @@ const categories = [
 ];
 
 const TvShows = () => {
-  const [shows, setShows] = useState([]);
   const [categoryIndex, setCategoryIndex] = useState(0);
-  const [pages, setPages] = useState(1);
   const [flip, setFlip] = useState(false);
 
   const currentCategory = categories[categoryIndex];
 
-  function handleprevious() {
-    if (pages > 1) {
-      setPages(pages - 1);
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }
-  }
-
-  function handlenext() {
-    setPages(pages + 1);
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }
-
-  useEffect(() => {
-    const url = `https://api.themoviedb.org/3/${currentCategory.endpoint}?api_key=045795056156ee5e7e10fb86ea55ef40&page=${pages}`;
-
-    axios
-      .get(url)
-      .then((response) => {
-        setShows(response.data.results || []);
-      })
-      .catch((err) => console.log(err));
-  }, [categoryIndex, pages]);
+  const {
+    data: shows,
+    pages,
+    loading,
+    error,
+    handlenext,
+    handleprevious,
+    resetPages,
+  } = usePaginatedFetch(currentCategory.endpoint);
 
   function changeCategory() {
     setFlip(true);
 
     setTimeout(() => {
       setCategoryIndex((prev) => (prev + 1) % categories.length);
-      setPages(1); // reset pagination
+      resetPages(); // reset pagination
       setFlip(false);
     }, 300);
   }
