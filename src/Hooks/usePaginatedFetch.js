@@ -11,7 +11,7 @@ function usePaginatedFetch(endpoint) {
     setLoading(true);
     setError(null);
 
-    const url = `https://api.themoviedb.org/3/${endpoint}?api_key=045795056156ee5e7e10fb86ea55ef40&page=${pages}`;
+    const url = `https://api.themoviedb.org/3/${endpoint}?api_key=${import.meta.env.VITE_MOVIE_KEY}&page=${pages}`;
 
     axios
       .get(url)
