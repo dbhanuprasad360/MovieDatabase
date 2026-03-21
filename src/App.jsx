@@ -65,8 +65,8 @@ function App() {
       >
         <BrowserRouter>
           <Navbar />
-          <Sidebar />
-          <div className="ml-[50px] ">
+          {/* <Sidebar /> */}
+          <div className=" ">
             <Routes>
               <Route
                 path="/"

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 function MovieDetail() {
   const { id } = useParams();
@@ -13,6 +14,7 @@ function MovieDetail() {
   const [movie, setMovie] = useState(null);
   const [cast, setCast] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [trailer, setTrailer] = useState(null);
 
   const API_KEY = import.meta.env.VITE_MOVIE_KEY;
 
@@ -23,10 +25,23 @@ function MovieDetail() {
       axios.get(
         `https://api.themoviedb.org/3/movie/${id}/credits?api_key=${API_KEY}`,
       ),
+      axios.get(
+        `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`,
+      ), // ← add this
     ])
-      .then(([movieRes, castRes]) => {
+      .then(([movieRes, creditsRes, videosRes]) => {
         setMovie(movieRes.data);
-        setCast(castRes.data.cast.slice(0, 8)); // top 8 cast members only
+        setCast(creditsRes.data.cast.slice(0, 8));
+
+        // find the official trailer from youtube
+        const videos = videosRes.data.results;
+        const officialTrailer =
+          videos.find((v) => v.type === "Trailer" && v.site === "YouTube") ||
+          videos.find(
+            (v) => v.site === "YouTube", // fallback to any youtube video
+          );
+        if (officialTrailer) setTrailer(officialTrailer.key);
+        // key is the YouTube video ID like "dQw4w9WgXcQ"
       })
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
@@ -82,13 +97,15 @@ function MovieDetail() {
       </button>
 
       {/* MAIN CONTENT */}
-      <div className="max-w-5xl mx-auto  -mt-120 relative z-10 pb-20">
+      <div
+        className={`max-w-5xl mx-auto  ${backdrop ? "-mt-132" : "mt-[58px]"} relative z-10 pb-20"`}
+      >
         <div className="flex flex-col md:flex-row gap-8">
           {/* POSTER */}
           <img
             src={poster}
             alt={movie.title}
-            className="w-72  rounded-xl shadow-2xl flex-shrink-0 mx-auto md:mx-0"
+            className="w-72  rounded-xl mt-10 shadow-2xl flex-shrink-0 mx-auto md:mx-0"
           />
 
           {/* INFO */}
@@ -121,25 +138,47 @@ function MovieDetail() {
 
         {/* CAST SECTION */}
         {cast.length > 0 && (
-          <div className="mt-12">
+          <div className="mt-12 pb-10">
             <h2 className="text-2xl font-bold mb-4">Cast</h2>
             <div className="flex flex-wrap gap-4">
               {cast.map((member) => (
-                <div key={member.id} className="text-center">
-                  <img
-                    src={
-                      member.profile_path
-                        ? `https://image.tmdb.org/t/p/w185${member.profile_path}`
-                        : "https://via.placeholder.com/80x80?text=?"
-                    }
-                    alt={member.name}
-                    className="w-28 h-36 rounded-lg object-cover mx-auto mb-2 border-2 border-white/20"
-                  />
-                  <p className="text-xs text-gray-300 leading-tight">
-                    {member.name}
-                  </p>
-                </div>
+                <Link to={`/person/${member.id}`} key={member.id}>
+                  <div className="text-center w-36 hover:scale-105 transition duration-300">
+                    <img
+                      src={
+                        member.profile_path
+                          ? `https://image.tmdb.org/t/p/w185${member.profile_path}`
+                          : "https://via.placeholder.com/80x80?text=?"
+                      }
+                      alt={member.name}
+                      className="w-36 h-48 rounded-lg object-cover mx-auto mb-2 border-2 border-white/20"
+                    />
+                    <p className="text-sm text-gray-300 leading-tight">
+                      {member.name}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {member.character}
+                    </p>
+                    {/* ↑ shows the character name they played */}
+                  </div>
+                </Link>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* TRAILER SECTION */}
+        {trailer && (
+          <div className="p-12">
+            <h2 className="text-2xl font-bold mb-4">🎬 Trailer</h2>
+            <div className="relative w-[60vw] aspect-video rounded-xl overflow-hidden shadow-2xl">
+              <iframe
+                src={`https://www.youtube.com/embed/${trailer}?autoplay=0&rel=0`}
+                title="Trailer"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
             </div>
           </div>
         )}

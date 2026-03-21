@@ -9,25 +9,25 @@ const Sidebar = () => {
     <div
       onMouseEnter={() => setCollapsed(false)}
       onMouseLeave={() => setCollapsed(true)}
-      className={`h-screen z-10 fixed left-0 top-0 bg-gray-700 text-white
+      className={`h-screen z-15 fixed left-0 top-[58px] bg-black/85 backdrop-blur-md border-b border-white/[0.5] text-white
       flex flex-col items-start p-2
       transition-all duration-300
-    overflow-hidden ${collapsed ? "w-[50px]" : "w-[220px]"}`}
+    overflow-hidden ${collapsed ? "w-[50px]" : "w-[170px]"}`}
     >
       {/* Toggle Button */}
-      <button
+      {/* <button
         onClick={() => setCollapsed((prev) => !prev)}
-        className="text-white text-xl mb-6 hover:text-blue-400"
+        className="text-white text-xl mb-6 hover:text-green-400"
       >
         ☰
-      </button>
+      </button> */}
 
       {/* Links */}
       <div className="flex flex-col mt-10 space-y-6">
         <Link
           to="/Actors"
           onClick={() => setCollapsed(true)}
-          className="flex items-center  hover:text-blue-400"
+          className="flex items-center  hover:text-green-400"
         >
           <span>⭐</span>
           {!collapsed && <span className="text-lg font-semibold">Stars</span>}
@@ -36,7 +36,7 @@ const Sidebar = () => {
         <Link
           to="/movies"
           onClick={() => setCollapsed(true)}
-          className="flex items-center  hover:text-blue-400"
+          className="flex items-center  hover:text-green-400"
         >
           <span>🎬</span>
           {!collapsed && <span className="text-lg font-semibold">Movies</span>}
@@ -45,7 +45,7 @@ const Sidebar = () => {
         <Link
           to="/tvshow"
           onClick={() => setCollapsed(true)}
-          className="flex items-center  hover:text-blue-400"
+          className="flex items-center  hover:text-green-400"
         >
           <span>📺</span>
           {!collapsed && (
@@ -56,7 +56,7 @@ const Sidebar = () => {
         <Link
           to="/watchlist"
           onClick={() => setCollapsed(true)}
-          className="flex items-center  hover:text-blue-400"
+          className="flex items-center  hover:text-green-400"
         >
           <span>❤️</span>
           {!collapsed && (
@@ -67,11 +67,11 @@ const Sidebar = () => {
         <Link
           to="/recommend"
           onClick={() => setCollapsed(true)}
-          className="flex items-center  hover:text-blue-400"
+          className="flex items-center  hover:text-green-400"
         >
           <span>🤖</span>
           {!collapsed && (
-            <span className="text-lg font-semibold">Recommendations</span>
+            <span className="text-lg font-semibold">Recommend</span>
           )}
         </Link>
       </div>

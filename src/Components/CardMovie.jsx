@@ -22,7 +22,7 @@ function CardMovie({ movieobject }) {
     <div className="m-1">
       <Link to={`/movie/${movieobject.id}`}>
         <div
-          className="w-40 sm:w-48 md:w-56 aspect-[2/3] relative rounded-lg bg-cover bg-center hover:scale-105 transition duration-300"
+          className="w-48 sm:w-56 md:w-64 aspect-[2/3] mb-10 relative rounded-lg bg-cover bg-center hover:scale-105 transition duration-300"
           style={{ backgroundImage: `url(${poster})` }}
         >
           <h5 className="text-white text-center font-bold bg-black/70 p-2 rounded-t-lg">

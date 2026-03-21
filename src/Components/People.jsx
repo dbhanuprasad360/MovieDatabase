@@ -41,9 +41,9 @@ const People = () => {
   return (
     <div>
       <Banner />
-      <div className="w-full mt-20">
+      <div className="w-full mt-[58px]">
         {/* SECTION TITLE */}
-        <div className="flex justify-center mb-10">
+        <div className="flex justify-center pt-10 mb-10">
           <div
             onClick={changeCategory}
             className={`w-[300px] h-[80px] flex items-center justify-center
@@ -59,7 +59,7 @@ const People = () => {
         </div>
 
         {/* People GRID */}
-        <div className="flex flex-wrap justify-center gap-1">
+        <div className="flex flex-wrap justify-center gap-3">
           {people.map((peopleobj) => (
             <CardPeople key={peopleobj.id} personobject={peopleobj} />
           ))}

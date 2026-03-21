@@ -7,10 +7,10 @@ function Banner() {
         className="fixed -z-100 h-[100vh] w-[100vw] bg-cover"
         style={{
           backgroundImage:
-            "url(https://image.tmdb.org/t/p/original/peAzdLKtT6VDWIfPQO9LJD1NCG4.jpg",
+            "url(https://images.unsplash.com/photo-1489599849927-2ee91cede3ba",
         }}
       >
-        <div className="relative h-[100vh] bg-gradient-to-t from-black to-transparent"></div>
+        {/* <div className="relative h-[100vh] bg-gradient-to-t from-black to-transparent"></div> */}
       </div>
     </div>
   );
