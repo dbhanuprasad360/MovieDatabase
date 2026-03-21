@@ -1,3 +1,9 @@
+import React, { useState } from "react";
+import Banner from "./Banner";
+import CardMovie from "./CardMovie";
+import Pagination from "./Pagination";
+import usePaginatedFetch from "../Hooks/usePaginatedFetch";
+
 const categories = [
   {
     title: "Upcoming Movies",
@@ -12,12 +18,6 @@ const categories = [
     endpoint: "trending/movie/day",
   },
 ];
-
-import React, { useEffect, useState } from "react";
-import CardMovie from "./CardMovie";
-import axios from "axios";
-import Pagination from "./Pagination";
-import usePaginatedFetch from "../Hooks/usePaginatedFetch";
 
 const Movies = () => {
   const [categoryIndex, setCategoryIndex] = useState(0);
@@ -47,6 +47,7 @@ const Movies = () => {
 
   return (
     <div className="w-full mt-10">
+      <Banner />
       {/* SECTION TITLE */}
       <div className="flex justify-center  mb-10">
         <div
@@ -63,12 +64,20 @@ const Movies = () => {
         </div>
       </div>
 
-      {/* MOVIES */}
-      <div className="flex flex-wrap justify-evenly gap-1">
-        {movies.map((movieobj) => (
-          <CardMovie key={movieobj.id} movieobject={movieobj} />
-        ))}
-      </div>
+      {loading && (
+        <div className="text-white text-center mt-20 animate-pulse">
+          Loading...
+        </div>
+      )}
+      {error && <div className="text-red-400 text-center mt-20">{error}</div>}
+
+      {!loading && !error && (
+        <div className="flex flex-wrap justify-evenly gap-1">
+          {movies.map((movieobj) => (
+            <CardMovie key={movieobj.id} movieobject={movieobj} />
+          ))}
+        </div>
+      )}
 
       {/* PAGINATION */}
       <div className="flex justify-center mt-8">

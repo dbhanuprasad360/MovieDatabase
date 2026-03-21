@@ -11,6 +11,9 @@ import People from "./Components/People";
 import Login from "./Components/Login";
 import SignUp from "./Components/SignUp";
 import Sidebar from "./Components/Sidebar";
+import MovieDetail from "./Components/MovieDetail";
+import ShowDetail from "./Components/ShowDetail";
+import PeopleDetail from "./Components/PeopleDetail";
 
 function App() {
   const [watchList, setwatchList] = useState([]);
@@ -63,7 +66,7 @@ function App() {
         <BrowserRouter>
           <Navbar />
           <Sidebar />
-          <div className="ml-[50px] flex flex-wrap">
+          <div className="ml-[50px] ">
             <Routes>
               <Route
                 path="/"
@@ -79,11 +82,16 @@ function App() {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/tvshow" element={<TvShows />} />
               <Route path="/Actors" element={<People />} />
+
               <Route
                 path="/watchlist"
                 element={<Watchlist watchList={watchList} />}
               />
               {/* <Route path="/recommend" element={<Recommendation />} /> */}
+
+              <Route path="/movie/:id" element={<MovieDetail />} />
+              <Route path="/tv/:id" element={<ShowDetail />} />
+              <Route path="/person/:id" element={<PeopleDetail />} />
             </Routes>
           </div>
         </BrowserRouter>

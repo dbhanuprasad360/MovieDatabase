@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { MovieContext } from "./MovieContext";
+import { Link } from "react-router-dom";
 
 function CardMovie({ movieobject }) {
   const { watchList, handleAddToWatchList, handleRemoveFromWatchList } =
@@ -19,30 +20,38 @@ function CardMovie({ movieobject }) {
 
   return (
     <div className="m-1">
-      <div
-        className="w-40 sm:w-48 md:w-56 aspect-[2/3] relative rounded-lg bg-cover bg-center hover:scale-105 transition duration-300"
-        style={{ backgroundImage: `url(${poster})` }}
-      >
-        <h5 className="text-white text-center font-bold bg-black/70 p-2 rounded-t-lg">
-          {movieobject?.title || "Unknown Movie"}
-        </h5>
+      <Link to={`/movie/${movieobject.id}`}>
+        <div
+          className="w-40 sm:w-48 md:w-56 aspect-[2/3] relative rounded-lg bg-cover bg-center hover:scale-105 transition duration-300"
+          style={{ backgroundImage: `url(${poster})` }}
+        >
+          <h5 className="text-white text-center font-bold bg-black/70 p-2 rounded-t-lg">
+            {movieobject?.title || "Unknown Movie"}
+          </h5>
 
-        <div className="text-xl absolute bottom-0 left-0 rounded-lg bg-black/70 m-1 text-white p-3">
-          ⭐ {rating}
+          <div className="text-xl absolute bottom-0 left-0 rounded-lg bg-black/70 m-1 text-white p-3">
+            ⭐ {rating}
+          </div>
+
+          {isInWatchlist ? (
+            <i
+              onClick={(e) => {
+                e.preventDefault();
+                handleRemoveFromWatchList(movieobject);
+              }}
+              className="fa-solid fa-heart absolute bottom-0 right-0 text-red-500 text-3xl p-3 cursor-pointer"
+            ></i>
+          ) : (
+            <i
+              onClick={(e) => {
+                e.preventDefault();
+                handleAddToWatchList(movieobject);
+              }}
+              className="fa-regular fa-heart absolute bottom-0 right-0 text-white hover:text-red-500 text-3xl p-3 cursor-pointer"
+            ></i>
+          )}
         </div>
-
-        {isInWatchlist ? (
-          <i
-            onClick={() => handleRemoveFromWatchList(movieobject)}
-            className="fa-solid fa-heart absolute bottom-0 right-0 text-red-500 text-3xl p-3 cursor-pointer"
-          ></i>
-        ) : (
-          <i
-            onClick={() => handleAddToWatchList(movieobject)}
-            className="fa-regular fa-heart absolute bottom-0 right-0 text-white hover:text-red-500 text-3xl p-3 cursor-pointer"
-          ></i>
-        )}
-      </div>
+      </Link>
     </div>
   );
 }
