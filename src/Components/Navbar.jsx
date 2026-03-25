@@ -14,7 +14,7 @@ function Navbar() {
   }
 
   const links = [
-    { to: "/", label: "Movies" },
+    { to: "/movies", label: "Movies" },
     { to: "/tvshow", label: "TV Shows" },
     { to: "/Actors", label: "Actors" },
     { to: "/watchlist", label: "Watchlist" },
@@ -41,11 +41,14 @@ function Navbar() {
       />
 
       {/* BRAND */}
-      <div className="flex items-center gap-2 flex-shrink-0 mr-8 pl-[54px]">
+      <Link
+        to="/"
+        className="flex items-center gap-2 flex-shrink-0 mr-8 pl-[54px]"
+      >
         <div
           className="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600
-          rounded-lg flex items-center justify-center text-sm
-          shadow-[0_0_12px_rgba(34,197,94,0.3)]"
+    rounded-lg flex items-center justify-center text-sm
+    shadow-[0_0_12px_rgba(34,197,94,0.3)]"
         >
           🎬
         </div>
@@ -55,13 +58,17 @@ function Navbar() {
         >
           CINE<span className="text-green-400">DB</span>
         </span>
-      </div>
+      </Link>
 
       {/* CENTER LINKS */}
       <nav className="flex-1 flex items-center justify-center gap-1">
         {links.map(({ to, label }) => {
           // check if this link is active
-          const isActive = location.pathname === to;
+          const isActive =
+            location.pathname === to ||
+            (to === "/movies" && location.pathname.startsWith("/movie/")) ||
+            (to === "/tvshow" && location.pathname.startsWith("/tv/")) ||
+            (to === "/Actors" && location.pathname.startsWith("/person/"));
           return (
             <Link
               key={to}

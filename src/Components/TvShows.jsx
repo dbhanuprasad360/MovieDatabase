@@ -3,24 +3,14 @@ import CardShow from "./CardShow";
 import Pagination from "./Pagination";
 import Banner from "./Banner";
 import usePaginatedFetch from "../Hooks/usePaginatedFetch";
+import MediaCard from "./MediaCard";
 
 const categories = [
-  {
-    title: "Top Rated Shows",
-    endpoint: "tv/top_rated",
-  },
-  {
-    title: "Popular Shows",
-    endpoint: "tv/popular",
-  },
-  {
-    title: "On Air Shows",
-    endpoint: "tv/on_the_air",
-  },
-  {
-    title: "On Air Today",
-    endpoint: "tv/airing_today",
-  },
+  { title: "Top Rated Shows", endpoint: "tv/top_rated" },
+  { title: "Popular Shows", endpoint: "tv/popular" },
+  { title: "Trending This Week", endpoint: "trending/tv/week" },
+  { title: "On The Air", endpoint: "tv/on_the_air" },
+  { title: "Airing Today", endpoint: "tv/airing_today" },
 ];
 
 const TvShows = () => {
@@ -72,7 +62,7 @@ const TvShows = () => {
         {/* SHOWS GRID */}
         <div className="flex flex-wrap justify-center gap-3">
           {shows.map((showobj) => (
-            <CardShow key={showobj.id} showobject={showobj} />
+            <MediaCard key={movieobj.id} item={movieobj} type="tv" />
           ))}
         </div>
 

@@ -1,22 +1,16 @@
 import React, { useState } from "react";
 import Banner from "./Banner";
-import CardMovie from "./CardMovie";
 import Pagination from "./Pagination";
 import usePaginatedFetch from "../Hooks/usePaginatedFetch";
+import MediaCard from "./MediaCard";
 
 const categories = [
-  {
-    title: "Upcoming Movies",
-    endpoint: "movie/upcoming",
-  },
-  {
-    title: "Popular Movies",
-    endpoint: "movie/popular",
-  },
-  {
-    title: "Trending Movies",
-    endpoint: "trending/movie/day",
-  },
+  { title: "Upcoming Movies", endpoint: "movie/upcoming" },
+  { title: "Popular Movies", endpoint: "movie/popular" },
+  { title: "Trending Today", endpoint: "trending/movie/day" },
+  { title: "Trending This Week", endpoint: "trending/movie/week" },
+  { title: "Top Rated Movies", endpoint: "movie/top_rated" },
+  { title: "Now Playing", endpoint: "movie/now_playing" },
 ];
 
 const Movies = () => {
@@ -75,7 +69,7 @@ const Movies = () => {
         {!loading && !error && (
           <div className="flex flex-wrap justify-center gap-3">
             {movies.map((movieobj) => (
-              <CardMovie key={movieobj.id} movieobject={movieobj} />
+              <MediaCard key={movieobj.id} item={movieobj} type="movie" />
             ))}
           </div>
         )}

@@ -3,17 +3,26 @@ import Banner from "./Components/Banner";
 import Movies from "./Components/Movies";
 import Watchlist from "./Components/Watchlist";
 import Recommendation from "./Components/Recommendation";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, useLocation, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MovieContext } from "./Components/MovieContext";
 import TvShows from "./Components/TvShows";
 import People from "./Components/People";
 import Login from "./Components/Login";
-import SignUp from "./Components/SignUp";
-import Sidebar from "./Components/Sidebar";
+import Home from "./Components/Home";
 import MovieDetail from "./Components/MovieDetail";
 import ShowDetail from "./Components/ShowDetail";
 import PeopleDetail from "./Components/PeopleDetail";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null; // renders nothing, just runs the effect
+}
 
 function App() {
   const [watchList, setwatchList] = useState([]);
@@ -64,22 +73,13 @@ function App() {
         }}
       >
         <BrowserRouter>
+          <ScrollToTop />
           <Navbar />
           {/* <Sidebar /> */}
-          <div className=" ">
+          <div className="mt-[62px] ">
             <Routes>
-              <Route
-                path="/"
-                element={
-                  <>
-                    <Banner />
-                    <Movies />
-                  </>
-                }
-              />
+              <Route path="/" element={<Home />} />
               <Route path="/movies" element={<Movies />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
               <Route path="/tvshow" element={<TvShows />} />
               <Route path="/Actors" element={<People />} />
 
@@ -87,7 +87,8 @@ function App() {
                 path="/watchlist"
                 element={<Watchlist watchList={watchList} />}
               />
-              {/* <Route path="/recommend" element={<Recommendation />} /> */}
+              <Route path="/recommend" element={<Recommendation />} />
+              <Route path="/login" element={<Login />} />
 
               <Route path="/movie/:id" element={<MovieDetail />} />
               <Route path="/tv/:id" element={<ShowDetail />} />

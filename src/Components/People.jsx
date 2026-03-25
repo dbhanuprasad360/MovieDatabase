@@ -4,12 +4,12 @@ import axios from "axios";
 import Pagination from "./Pagination";
 import Banner from "./Banner";
 import usePaginatedFetch from "../Hooks/usePaginatedFetch";
+import MediaCard from "./MediaCard";
 
 const categories = [
-  {
-    title: "Popular Actors",
-    endpoint: "person/popular",
-  },
+  { title: "Popular Actors", endpoint: "person/popular" },
+  { title: "Trending Today", endpoint: "trending/person/day" },
+  { title: "Trending This Week", endpoint: "trending/person/week" },
 ];
 
 const People = () => {
@@ -61,7 +61,7 @@ const People = () => {
         {/* People GRID */}
         <div className="flex flex-wrap justify-center gap-3">
           {people.map((peopleobj) => (
-            <CardPeople key={peopleobj.id} personobject={peopleobj} />
+            <MediaCard key={movieobj.id} item={movieobj} type="person" />
           ))}
         </div>
 

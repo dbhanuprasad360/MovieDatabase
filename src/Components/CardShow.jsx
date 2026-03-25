@@ -10,7 +10,7 @@ function CardShow({ showobject }) {
 
   // SAFE poster
   const poster = showobject?.poster_path
-    ? `https://image.tmdb.org/t/p/original${showobject.poster_path}`
+    ? `https://image.tmdb.org/t/p/w342${showobject.poster_path}`
     : "https://via.placeholder.com/200x300?text=No+Poster";
 
   // SAFE rating

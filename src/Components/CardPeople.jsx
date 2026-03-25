@@ -18,7 +18,7 @@ function CardPeople({ personobject }) {
           className="w-48 sm:w-56 md:w-64 aspect-[2/3] hover:scale-105 m-1 relative  transition duration-300  rounded-lg bg-cover"
           style={{
             backgroundImage: `url(
-            https://image.tmdb.org/t/p/original/${personobject.profile_path}
+            https://image.tmdb.org/t/p/w342/${personobject.profile_path}
           )`,
           }}
         >
