@@ -69,7 +69,7 @@ function MovieDetail() {
     : null;
 
   const poster = movie.poster_path
-    ? `https://image.tmdb.org/t/p/original${movie.poster_path}`
+    ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
     : "https://via.placeholder.com/300x450?text=No+Poster";
 
   return (
@@ -88,9 +88,7 @@ function MovieDetail() {
       {/* BACK BUTTON */}
       <button
         onClick={() => navigate(-1)}
-        // navigate(-1) means "go back one page in history"
-        // just like clicking the browser back button
-        className="fixed top-20 left-16 z-50 bg-black/60 hover:bg-black/90
+        className="fixed top-[70px] left-4 z-50 bg-black/60 hover:bg-black/90
         text-white px-4 py-2 rounded-full text-sm transition-all border border-white/20"
       >
         ← Back
@@ -98,14 +96,14 @@ function MovieDetail() {
 
       {/* MAIN CONTENT */}
       <div
-        className={`max-w-5xl mx-auto  ${backdrop ? "-mt-132" : "mt-[58px]"} relative z-10 pb-20"`}
+        className={`max-w-5xl mx-auto  ${backdrop ? "-mt-[35rem]" : "mt-[62px]"} relative z-10 pb-20"`}
       >
         <div className="flex flex-col md:flex-row gap-8">
           {/* POSTER */}
           <img
             src={poster}
             alt={movie.title}
-            className="w-72  rounded-xl mt-10 shadow-2xl flex-shrink-0 mx-auto md:mx-0"
+            className="w-48 md:w-72 rounded-xl shadow-2xl flex-shrink-0 mx-auto md:mx-0 object-cover"
           />
 
           {/* INFO */}
@@ -147,7 +145,7 @@ function MovieDetail() {
                     <img
                       src={
                         member.profile_path
-                          ? `https://image.tmdb.org/t/p/w185${member.profile_path}`
+                          ? `https://image.tmdb.org/t/p/w342${member.profile_path}`
                           : "https://via.placeholder.com/80x80?text=?"
                       }
                       alt={member.name}

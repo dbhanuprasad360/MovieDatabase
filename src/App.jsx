@@ -13,6 +13,7 @@ import Home from "./Components/Home";
 import MovieDetail from "./Components/MovieDetail";
 import ShowDetail from "./Components/ShowDetail";
 import PeopleDetail from "./Components/PeopleDetail";
+import Footer from "./Components/Footer";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -95,6 +96,7 @@ function App() {
               <Route path="/person/:id" element={<PeopleDetail />} />
             </Routes>
           </div>
+          <Footer />
         </BrowserRouter>
       </MovieContext.Provider>
     </>

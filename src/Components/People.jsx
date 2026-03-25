@@ -24,6 +24,7 @@ const People = () => {
     loading,
     error,
     handlenext,
+    goToPage,
     handleprevious,
     resetPages,
   } = usePaginatedFetch(currentCategory.endpoint);
@@ -50,7 +51,7 @@ const People = () => {
           text-white text-3xl font-bold rounded-xl relative
           bg-gradient-to-r from-black via-gray-900 to-black
           border border-gray-700 shadow-lg cursor-pointer
-          hover:border-blue-500 hover:scale-105
+          hover:border-green-500 hover:scale-105
           transition-all duration-500
           ${flip ? "sectionFlip" : ""}`}
           >
@@ -61,7 +62,7 @@ const People = () => {
         {/* People GRID */}
         <div className="flex flex-wrap justify-center gap-3">
           {people.map((peopleobj) => (
-            <MediaCard key={movieobj.id} item={movieobj} type="person" />
+            <MediaCard key={peopleobj.id} item={peopleobj} type="person" />
           ))}
         </div>
 
@@ -71,6 +72,7 @@ const People = () => {
             prevFn={handleprevious}
             pageNumber={pages}
             nextFn={handlenext}
+            goToPage={goToPage}
           />
         </div>
       </div>

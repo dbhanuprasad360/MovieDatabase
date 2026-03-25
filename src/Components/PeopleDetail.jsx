@@ -10,7 +10,7 @@ function PeopleDetail() {
   const [knownFor, setKnownFor] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mediaFilter, setMediaFilter] = useState("all"); // all, movie, tv
-  const [sortBy, setSortBy] = useState("rating"); // rating, date, popularity
+  const [sortBy, setSortBy] = useState("date"); // rating, date, popularity
   const [roleFilter, setRoleFilter] = useState("all"); // all, main, support
   const [backdrop, setBackdrop] = useState(null);
 
@@ -50,11 +50,10 @@ function PeopleDetail() {
         });
 
         const deduplicated = Array.from(seen.values());
-        setKnownFor(deduplicated); // store all, sorting/filtering happens in render
-
-        const topItem = deduplicated.sort(
+        const topItem = [...deduplicated].sort(
           (a, b) => b.vote_average - a.vote_average,
         )[0];
+        setKnownFor(deduplicated); // clean unsorted array stored in state
         if (topItem?.backdrop_path) {
           setBackdrop(
             `https://image.tmdb.org/t/p/original${topItem.backdrop_path}`,
@@ -80,17 +79,17 @@ function PeopleDetail() {
     );
 
   const photo = person.profile_path
-    ? `https://image.tmdb.org/t/p/original${person.profile_path}`
+    ? `https://image.tmdb.org/t/p/w342${person.profile_path}`
     : "https://via.placeholder.com/300x450?text=No+Photo";
 
   return (
     <div
-      className="min-h-screen text-white bg-black bg-cover bg-center -ml-[50px] bg-fixed relative"
+      className="min-h-screen text-white bg-black bg-cover bg-center  bg-fixed relative"
       style={backdrop ? { backgroundImage: `url(${backdrop})` } : {}}
     >
       {/* dark overlay so text is readable over the backdrop */}
       {backdrop && (
-        <div className="absolute inset-0 bg-black/80 backdrop-sm z-0 " />
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-0" />
       )}
 
       {/* wrap all existing content in a relative div so it sits above the overlay */}
@@ -98,7 +97,7 @@ function PeopleDetail() {
         {/* BACK BUTTON */}
         <button
           onClick={() => navigate(-1)}
-          className="fixed top-20 left-16 z-50 bg-black/60 hover:bg-black/90
+          className="fixed top-[70px] left-4 z-50 bg-black/60 hover:bg-black/90
         text-white px-4 py-2 rounded-full text-sm transition-all border border-white/20"
         >
           ← Back
@@ -106,7 +105,7 @@ function PeopleDetail() {
 
         {/* HERO SECTION — photo on left, info on right */}
         <div
-          className={`max-w-5xl mx-auto ${backdrop ? "pt-[80px]" : "pt-[58px]"} px-6 pb-20`}
+          className={`max-w-5xl mx-auto px-6 pb-20 ${backdrop ? "pt-[28px]" : "pt-[62px]"}`}
         >
           <div className="flex flex-col md:flex-row gap-10">
             {/* PHOTO */}
@@ -302,7 +301,7 @@ function PeopleDetail() {
                         <img
                           src={
                             item.poster_path
-                              ? `https://image.tmdb.org/t/p/w185${item.poster_path}`
+                              ? `https://image.tmdb.org/t/p/w342${item.poster_path}`
                               : "https://via.placeholder.com/144x200?text=?"
                           }
                           alt={item.title || item.name}

@@ -26,6 +26,7 @@ const Movies = () => {
     error,
     handlenext,
     handleprevious,
+    goToPage,
     resetPages,
   } = usePaginatedFetch(currentCategory.endpoint);
 
@@ -51,7 +52,7 @@ const Movies = () => {
           text-white text-3xl font-bold rounded-xl 
           bg-gradient-to-r from-black via-gray-900 to-black
           border border-gray-700 shadow-lg cursor-pointer
-          hover:border-blue-500 hover:scale-105
+          hover:border-green-500 hover:scale-105
           transition-all blinkBorder duration-500
           ${flip ? "sectionFlip" : ""}`}
           >
@@ -80,6 +81,7 @@ const Movies = () => {
             prevFn={handleprevious}
             pageNumber={pages}
             nextFn={handlenext}
+            goToPage={goToPage}
           />
         </div>
       </div>

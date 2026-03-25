@@ -13,7 +13,6 @@ function usePaginatedFetch(endpoint) {
 
     const API_KEY = import.meta.env.VITE_MOVIE_KEY;
 
-    // fetch two pages at once using Promise.all
     const page1 = axios.get(
       `https://api.themoviedb.org/3/${endpoint}?api_key=${API_KEY}&page=${pages * 2 - 1}`,
     );
@@ -27,7 +26,7 @@ function usePaginatedFetch(endpoint) {
           ...(res1.data.results || []),
           ...(res2.data.results || []),
         ];
-        setData(combined); // 40 results total
+        setData(combined);
       })
       .catch((err) => {
         console.log(err);
@@ -35,11 +34,6 @@ function usePaginatedFetch(endpoint) {
       })
       .finally(() => setLoading(false));
   }, [endpoint, pages]);
-
-  // pages * 2 - 1 and pages * 2 means:
-  // UI page 1 → fetches TMDB pages 1 and 2
-  // UI page 2 → fetches TMDB pages 3 and 4
-  // UI page 3 → fetches TMDB pages 5 and 6
 
   function handleprevious() {
     if (pages > 1) {
@@ -53,6 +47,14 @@ function usePaginatedFetch(endpoint) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  // ✅ new — jump directly to any page number
+  function goToPage(page) {
+    if (page >= 1) {
+      setPages(page);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
   function resetPages() {
     setPages(1);
   }
@@ -64,6 +66,7 @@ function usePaginatedFetch(endpoint) {
     error,
     handlenext,
     handleprevious,
+    goToPage, // ← export it
     resetPages,
   };
 }

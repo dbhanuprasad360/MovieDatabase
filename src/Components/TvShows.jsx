@@ -26,6 +26,7 @@ const TvShows = () => {
     error,
     handlenext,
     handleprevious,
+    goToPage,
     resetPages,
   } = usePaginatedFetch(currentCategory.endpoint);
 
@@ -51,7 +52,7 @@ const TvShows = () => {
           text-white text-3xl font-bold rounded-xl relative 
           bg-gradient-to-r from-black via-gray-900 to-black
           border border-gray-700 shadow-lg cursor-pointer
-          hover:border-blue-500 hover:scale-105
+          hover:border-green-500 hover:scale-105
           transition-all duration-500
           ${flip ? "sectionFlip" : ""}`}
           >
@@ -62,7 +63,7 @@ const TvShows = () => {
         {/* SHOWS GRID */}
         <div className="flex flex-wrap justify-center gap-3">
           {shows.map((showobj) => (
-            <MediaCard key={movieobj.id} item={movieobj} type="tv" />
+            <MediaCard key={showobj.id} item={showobj} type="tv" />
           ))}
         </div>
 
@@ -72,6 +73,7 @@ const TvShows = () => {
             prevFn={handleprevious}
             pageNumber={pages}
             nextFn={handlenext}
+            goToPage={goToPage}
           />
         </div>
       </div>

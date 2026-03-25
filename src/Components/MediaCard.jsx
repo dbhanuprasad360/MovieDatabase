@@ -32,7 +32,7 @@ function MediaCard({ item, type }) {
         : `/person/${item?.id}`;
 
   return (
-    <div className="m-1 flex flex-col w-36 sm:w-40 md:w-48">
+    <div className="m-1 flex flex-col w-56 sm:w-40 md:w-56">
       <Link to={link}>
         <div
           className="w-full aspect-[2/3] relative rounded-lg bg-cover bg-center
