@@ -14,6 +14,7 @@ import MovieDetail from "./Components/MovieDetail";
 import ShowDetail from "./Components/ShowDetail";
 import PeopleDetail from "./Components/PeopleDetail";
 import Footer from "./Components/Footer";
+import Fun from "./Components/Fun";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -83,13 +84,14 @@ function App() {
               <Route path="/movies" element={<Movies />} />
               <Route path="/tvshow" element={<TvShows />} />
               <Route path="/Actors" element={<People />} />
+              <Route path="/fun" element={<Fun />} />
 
-              <Route
+              {/* <Route
                 path="/watchlist"
                 element={<Watchlist watchList={watchList} />}
               />
               <Route path="/recommend" element={<Recommendation />} />
-              <Route path="/login" element={<Login />} />
+              <Route path="/login" element={<Login />} /> */}
 
               <Route path="/movie/:id" element={<MovieDetail />} />
               <Route path="/tv/:id" element={<ShowDetail />} />

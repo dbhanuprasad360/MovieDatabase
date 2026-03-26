@@ -17,8 +17,9 @@ function Navbar() {
     { to: "/movies", label: "Movies" },
     { to: "/tvshow", label: "TV Shows" },
     { to: "/Actors", label: "Actors" },
-    { to: "/watchlist", label: "Watchlist" },
-    { to: "/recommend", label: "Recommendations" },
+    { to: "/fun", label: "Fun Zone 🎲" },
+    // { to: "/watchlist", label: "Watchlist" },
+    // { to: "/recommend", label: "Recommendations" },
   ];
 
   return (
