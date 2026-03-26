@@ -114,14 +114,17 @@ function RandomTrailer() {
           </div>
 
           {/* trailer */}
-          <div className="w-full aspect-video rounded-xl overflow-hidden shadow-2xl">
-            <iframe
-              src={`https://www.youtube.com/embed/${trailer}?autoplay=1&rel=0`}
-              title="Random Trailer"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
+          {/* trailer */}
+          <div className="w-full flex justify-center">
+            <div className="w-[70vw] aspect-video rounded-xl overflow-hidden shadow-2xl">
+              <iframe
+                src={`https://www.youtube.com/embed/${trailer}?autoplay=1&rel=0`}
+                title="Random Trailer"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
           </div>
         </div>
       )}
@@ -245,55 +248,77 @@ function RandomPick() {
 }
 
 // ── SPIN THE WHEEL SECTION ──
+// Drop-in replacement for the SpinWheel component in Fun.jsx
+// Changes:
+//   • Desktop: after first spin, wheel locks to the left and results panel
+//              stays mounted on the right for ALL subsequent spins
+//   • Re-spin: previous cards stay visible (dimmed) while wheel is spinning
+//              and while new movies are fetching — no blank-panel flash ever
+//   • Cards + genre header only swap once the NEW fetch resolves
+//   • Mobile:  results show below the wheel with bigger cards (2-col grid)
+//
+// tailwind.config.js — add these to theme.extend:
+//   keyframes: {
+//     'fade-in':  { from: { opacity: '0', transform: 'translateX(12px)' }, to: { opacity: '1', transform: 'translateX(0)' } },
+//     'shimmer':  { '0%,100%': { transform: 'translateX(-200%)' }, '50%': { transform: 'translateX(200%)' } },
+//   },
+//   animation: {
+//     'fade-in': 'fade-in 0.4s ease-out forwards',
+//     'shimmer': 'shimmer 1s ease-in-out infinite',
+//   },
+
 function SpinWheel() {
   const [spinning, setSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
-  const [selectedGenre, setSelectedGenre] = useState(null);
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+
+  // "displayed" state — what's visible in the right panel right now
+  const [displayGenre, setDisplayGenre] = useState(null);
+  const [displayMovies, setDisplayMovies] = useState([]);
+
+  // true only while the NEW batch of movies is fetching (after wheel stops)
+  const [refreshing, setRefreshing] = useState(false);
 
   const segmentAngle = 360 / GENRES.length;
 
   function spin() {
     if (spinning) return;
     setSpinning(true);
-    setSelectedGenre(null);
-    setMovies([]);
+    // ← do NOT clear displayGenre / displayMovies here
+    //   previous cards stay visible while the wheel spins
 
-    const extraSpins = 1440 + Math.random() * 1440; // 4-8 full rotations
+    const extraSpins = 1440 + Math.random() * 1440;
     const newRotation = rotation + extraSpins;
     setRotation(newRotation);
 
     setTimeout(() => {
-      // figure out which genre landed at the top
-      const normalised = newRotation % 360;
-      const index =
-        Math.floor(
-          ((360 - normalised + segmentAngle / 2) % 360) / segmentAngle,
-        ) % GENRES.length;
+      const normalized = newRotation % 360;
+
+      // pointer is at top → adjust by 270deg
+      const pointerAngle = (360 - normalized + 360) % 360;
+
+      const index = Math.floor(pointerAngle / segmentAngle) % GENRES.length;
 
       const genre = GENRES[index];
-      setSelectedGenre(genre);
       setSpinning(false);
-      fetchGenreMovies(genre.id);
+      fetchGenreMovies(genre); // pass full genre object
     }, 4000);
   }
 
-  async function fetchGenreMovies(genreId) {
-    setLoading(true);
+  async function fetchGenreMovies(genre) {
+    setRefreshing(true);
     try {
       const res = await axios.get(
-        `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc`,
+        `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genre.id}&sort_by=trending.desc`,
       );
-      setMovies(res.data.results.slice(0, 6));
+      // only NOW swap out what's shown — no empty-panel flash
+      setDisplayGenre(genre);
+      setDisplayMovies(res.data.results.slice(0, 6));
     } catch (err) {
       console.log(err);
     }
-    setLoading(false);
+    setRefreshing(false);
   }
 
-  // generate conic gradient for the wheel
   const conicGradient = GENRES.map((_, i) => {
     const colors = [
       "#22c55e",
@@ -310,95 +335,130 @@ function SpinWheel() {
     return `${colors[i % colors.length]} ${start}deg ${end}deg`;
   }).join(", ");
 
+  // The panel stays visible as long as we've ever had a result
+  const hasResult = !!displayGenre;
+
   return (
-    <div className="flex flex-col items-center gap-8">
-      {/* WHEEL */}
-      <div className="relative">
+    /*
+     * Outer wrapper
+     * On desktop (md+): flex-row once we have a result, stays that way forever
+     * On mobile:        flex-col, results below
+     */
+    <div
+      className={`
+        flex flex-col items-center gap-8
+        md:items-start md:gap-0
+        ${hasResult ? "md:flex-row md:items-center" : ""}
+        transition-all duration-500
+      `}
+    >
+      {/* ── LEFT COLUMN: wheel + spin button ── */}
+      <div
+        className={`
+          flex flex-col items-center gap-6
+          transition-all duration-500
+          ${hasResult ? "md:w-auto md:pr-10" : "w-full"}
+        `}
+      >
         {/* pointer */}
-        <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-10
-          w-0 h-0 border-l-[10px] border-r-[10px] border-t-[20px]
-          border-l-transparent border-r-transparent border-t-green-400
-          drop-shadow-[0_0_6px_#22c55e]"
-        />
-
-        {/* wheel */}
-        <div
-          className="w-64 h-64 rounded-full border-4 border-green-500
-          shadow-[0_0_30px_rgba(34,197,94,0.4)] relative overflow-hidden"
-          style={{
-            background: `conic-gradient(${conicGradient})`,
-            transform: `rotate(${rotation}deg)`,
-            transition: spinning
-              ? "transform 4s cubic-bezier(0.17,0.67,0.12,0.99)"
-              : "none",
-          }}
-        >
-          {/* genre labels on wheel */}
-          {GENRES.map((genre, i) => {
-            const angle = i * segmentAngle + segmentAngle / 2;
-            const rad = (angle - 90) * (Math.PI / 180);
-            const x = 50 + 32 * Math.cos(rad);
-            const y = 50 + 32 * Math.sin(rad);
-            return (
-              <span
-                key={genre.id}
-                className="absolute text-white text-[9px] font-bold"
-                style={{
-                  left: `${x}%`,
-                  top: `${y}%`,
-                  transform: `translate(-50%, -50%) rotate(${angle}deg)`,
-                  textShadow: "0 1px 3px rgba(0,0,0,0.8)",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {genre.name}
-              </span>
-            );
-          })}
-
-          {/* center circle */}
+        <div className="relative">
           <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-            w-8 h-8 bg-green-400 rounded-full shadow-lg z-10"
+            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-10
+              w-0 h-0
+              border-l-[10px] border-r-[10px] border-t-[20px]
+              border-l-transparent border-r-transparent border-t-green-400
+              drop-shadow-[0_0_6px_#22c55e]"
           />
+
+          {/* wheel */}
+          <div
+            className="w-72 h-72 md:w-80 md:h-80 rounded-full border-4 border-green-500
+              shadow-[0_0_30px_rgba(34,197,94,0.4)] relative overflow-hidden"
+            style={{
+              background: `conic-gradient(${conicGradient})`,
+              transform: `rotate(${rotation}deg)`,
+              transition: spinning
+                ? "transform 4s cubic-bezier(0.17,0.67,0.12,0.99)"
+                : "none",
+            }}
+          >
+            {GENRES.map((genre, i) => {
+              const angle = i * segmentAngle + segmentAngle / 2;
+              const rad = (angle - 90) * (Math.PI / 180);
+              const x = 50 + 32 * Math.cos(rad);
+              const y = 50 + 32 * Math.sin(rad);
+              return (
+                <span
+                  key={genre.id}
+                  className="absolute text-white text-[13px] font-bold"
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                    transform: `translate(-50%, -50%) rotate(${angle}deg)`,
+                    textShadow: "0 1px 3px rgba(0,0,0,0.8)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {genre.name}
+                </span>
+              );
+            })}
+
+            {/* center dot */}
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                w-8 h-8 bg-green-400 rounded-full shadow-lg z-10"
+            />
+          </div>
         </div>
+
+        <button
+          onClick={spin}
+          disabled={spinning}
+          className="bg-gradient-to-r from-green-500 to-green-600
+            text-white font-semibold px-10 py-3 rounded-xl transition-all
+            shadow-[0_0_20px_rgba(34,197,94,0.3)] text-lg
+            disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {spinning ? "Spinning..." : "🎡 Spin!"}
+        </button>
       </div>
 
-      <button
-        onClick={spin}
-        disabled={spinning}
-        className="bg-gradient-to-r from-green-500 to-green-600
-        text-white font-semibold px-10 py-3 rounded-xl transition-all
-        shadow-[0_0_20px_rgba(34,197,94,0.3)] text-lg
-        disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {spinning ? "Spinning..." : "🎡 Spin!"}
-      </button>
-
-      {/* RESULT */}
-      {selectedGenre && !spinning && (
-        <div className="w-full">
-          <div className="text-center mb-6">
+      {/* ── RIGHT COLUMN (desktop) / BELOW (mobile): results ── */}
+      {hasResult && (
+        <div
+          className="
+            w-full
+            md:flex-1 md:border-l md:border-white/10 md:pl-10
+            animate-fade-in
+          "
+        >
+          {/* header — dims while spinning/refreshing so user knows something's happening */}
+          <div
+            className={`mb-5 transition-opacity duration-300 ${spinning || refreshing ? "opacity-40" : "opacity-100"}`}
+          >
             <p className="text-green-400 text-lg font-bold">
-              🎬 You got: {selectedGenre.name}!
+              🎬 You got: {displayGenre.name}!
             </p>
             <p className="text-gray-500 text-sm mt-1">
-              Here are some top {selectedGenre.name} movies for you
+              Top {displayGenre.name} picks for you
             </p>
           </div>
 
-          {loading ? (
-            <div className="text-center text-white animate-pulse">
-              Loading movies...
-            </div>
-          ) : (
-            <div className="flex flex-wrap justify-center gap-4">
-              {movies.map((movie) => (
+          {/*
+           * Cards stay mounted the whole time.
+           * While refreshing, a subtle pulse overlay dims them — no blank state.
+           * Desktop: 3-column grid | Mobile: 2-column grid with bigger cards
+           */}
+          <div
+            className={`relative transition-opacity duration-300 ${refreshing ? "opacity-40" : "opacity-100"}`}
+          >
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-5">
+              {displayMovies.map((movie) => (
                 <Link
                   key={movie.id}
                   to={`/movie/${movie.id}`}
-                  className="flex flex-col items-center w-28 group"
+                  className="flex flex-col items-center group"
                 >
                   <img
                     src={
@@ -407,19 +467,28 @@ function SpinWheel() {
                         : "https://via.placeholder.com/112x168?text=?"
                     }
                     alt={movie.title}
-                    className="w-28 h-40 object-cover rounded-lg border border-white/10
-                    group-hover:border-green-500/40 group-hover:scale-105 transition-all"
+                    className="w-36 h-52 md:w-full md:h-auto md:aspect-[2/3] object-cover
+                      rounded-xl border border-white/10
+                      group-hover:border-green-500/40 group-hover:scale-[1.03]
+                      transition-all shadow-lg"
                   />
                   <p
                     className="text-xs text-gray-400 mt-2 text-center leading-tight
-                    group-hover:text-white transition-colors line-clamp-2"
+                      group-hover:text-white transition-colors line-clamp-2 px-1"
                   >
                     {movie.title}
                   </p>
                 </Link>
               ))}
             </div>
-          )}
+
+            {/* thin "loading new results" bar at the top of the panel */}
+            {refreshing && (
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-green-500/30 rounded-full overflow-hidden">
+                <div className="h-full w-1/3 bg-green-400 rounded-full animate-[shimmer_1s_ease-in-out_infinite]" />
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -439,7 +508,7 @@ function Fun() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* HEADER */}
-      <div className="bg-gradient-to-b from-green-950/30 to-transparent py-12 px-8">
+      <div className="bg-gradient-to-b from-green-950/30 to-transparent py-6 px-8">
         <h1
           className="text-5xl font-black tracking-[4px] text-white mb-2"
           style={{ fontFamily: "'Bebas Neue', sans-serif" }}
@@ -451,7 +520,7 @@ function Fun() {
 
       {/* TABS */}
       <div className="px-8">
-        <div className="flex gap-3 mb-8 border-b border-white/[0.06] pb-4">
+        <div className="flex gap-3 mb-8 justify-center border-b border-white/[0.06] pb-4">
           {tabs.map(({ id, label }) => (
             <button
               key={id}
@@ -469,7 +538,7 @@ function Fun() {
         </div>
 
         {/* CONTENT */}
-        <div className="max-w-4xl pb-20">
+        <div className=" w-full pb-20">
           {activeTab === "trailer" && <RandomTrailer />}
           {activeTab === "pick" && <RandomPick />}
           {activeTab === "wheel" && <SpinWheel />}
