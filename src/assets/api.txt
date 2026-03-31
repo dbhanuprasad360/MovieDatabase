@@ -1,0 +1,15 @@
+API Key => api_key=045795056156ee5e7e10fb86ea55ef40
+
+Top Trending Movies=>  https://api.themoviedb.org/3/trending/movie/day?&language=en-US
+Top rated movies=> https://api.themoviedb.org/3/movie/top_rated?language=en-US
+Upcoming Movies => https://api.themoviedb.org/3/movie/upcoming?language=en-US
+up= https://api.themoviedb.org/3/movie/upcoming
+Popular People=> https://api.themoviedb.org/3/person/popular?language=en-US
+Trending People => https://api.themoviedb.org/3/trending/person/day?language=en-US
+
+Popular TV shows => https://api.themoviedb.org/3/tv/popular?language=en-US
+Top Rated TV Shows => https://api.themoviedb.org/3/tv/top_rated?language=en-US
+On Air TV Shows => https://api.themoviedb.org/3/tv/on_the_air?language=en-US
+
+TV Genres => https://api.themoviedb.org/3/genre/tv/list?language=en
+Movies Genres => https://api.themoviedb.org/3/genre/movie/list?language=en
