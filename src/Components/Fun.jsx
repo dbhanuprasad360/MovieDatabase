@@ -508,19 +508,18 @@ function Fun() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* HEADER */}
-      <div className="bg-gradient-to-b from-green-950/30 to-transparent py-6 px-8">
+      <div className="bg-gradient-to-b from-green-950/30 to-transparent py-4 px-8">
         <h1
-          className="text-5xl font-black tracking-[4px] text-white mb-2"
+          className="text-5xl font-black tracking-[4px] text-white "
           style={{ fontFamily: "'Bebas Neue', sans-serif" }}
         >
           FUN <span className="text-green-400">ZONE</span>
         </h1>
         <p className="text-gray-400">Discover something new — randomly!</p>
       </div>
-
-      {/* TABS */}
       <div className="px-8">
-        <div className="flex gap-3 mb-8 justify-center border-b border-white/[0.06] pb-4">
+        {/* TABS */}
+        <div className="flex gap-3 mb-4 justify-center border-b border-white/[0.06] pb-2">
           {tabs.map(({ id, label }) => (
             <button
               key={id}

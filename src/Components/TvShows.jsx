@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from "react";
-import CardShow from "./CardShow";
 import Pagination from "./Pagination";
 import Banner from "./Banner";
 import usePaginatedFetch from "../Hooks/usePaginatedFetch";

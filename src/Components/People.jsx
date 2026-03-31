@@ -1,6 +1,4 @@
 import React, { useEffect, useState, useContext } from "react";
-import CardPeople from "./CardPeople";
-import axios from "axios";
 import Pagination from "./Pagination";
 import Banner from "./Banner";
 import usePaginatedFetch from "../Hooks/usePaginatedFetch";

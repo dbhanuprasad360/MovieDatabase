@@ -3,9 +3,11 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { MovieContext } from "./MovieContext";
 
 function Navbar() {
-  const { isLoggedIn, setIsLoggedIn } = useContext(MovieContext);
+  const { isLoggedIn, setIsLoggedIn, isAdmin } = useContext(MovieContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [loginDropdown, setLoginDropdown] = useState(false);
   // useLocation tells us the current URL so we can highlight the active link
 
   function handleLogout() {
@@ -17,7 +19,7 @@ function Navbar() {
     { to: "/movies", label: "Movies" },
     { to: "/tvshow", label: "TV Shows" },
     { to: "/Actors", label: "Actors" },
-    { to: "/fun", label: "Fun Zone 🎲" },
+    { to: "/fun", label: "Fun Zone" },
     // { to: "/watchlist", label: "Watchlist" },
     // { to: "/recommend", label: "Recommendations" },
   ];
@@ -116,36 +118,158 @@ function Navbar() {
         <div className="w-px h-4 bg-white/[0.07]" />
 
         {/* User section */}
+
         {isLoggedIn ? (
-          <div className="flex items-center gap-2.5">
+          <div className="relative flex items-center gap-2.5">
+            {/* clicking the user info toggles dropdown */}
             <div
-              className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600
-              flex items-center justify-center text-white text-[11px] font-semibold
-              border border-indigo-500/40"
+              className="flex items-center gap-2.5 cursor-pointer"
+              onClick={() => setDropdownOpen((p) => !p)}
             >
-              JD
+              <div
+                className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600
+        flex items-center justify-center text-white text-[11px] font-semibold
+        border border-indigo-500/40"
+              >
+                JD
+              </div>
+              <div className="leading-tight">
+                <div className="text-gray-200 text-xs font-medium">
+                  John Doe
+                </div>
+                <div className="text-gray-600 text-[10px]">Member</div>
+              </div>
+              {/* arrow indicator */}
+              <span
+                className={`text-gray-500 text-xs transition-transform duration-200
+        ${dropdownOpen ? "rotate-180" : ""}`}
+              >
+                ▼
+              </span>
             </div>
-            <div className="leading-tight">
-              <div className="text-gray-200 text-xs font-medium">John Doe</div>
-              <div className="text-gray-600 text-[10px]">Member</div>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="text-red-400 text-xs font-medium border border-red-500/25
-              bg-red-500/10 hover:bg-red-500/20 px-3 py-1 rounded-lg transition-colors"
-            >
-              Logout
-            </button>
+
+            {/* DROPDOWN */}
+            {dropdownOpen && (
+              <>
+                {/* invisible backdrop to close on outside click */}
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-green-400
+    hover:text-green-300 hover:bg-green-500/[0.05] transition-colors text-sm"
+                  >
+                    <span>🔐</span> Admin Dashboard
+                  </Link>
+                )}
+                <div
+                  className="absolute top-10 right-0 z-40 w-48
+          bg-[#0f0f14] border border-white/[0.08] rounded-xl
+          shadow-2xl overflow-hidden"
+                >
+                  {/* user info header */}
+                  <div className="px-4 py-3 border-b border-white/[0.06]">
+                    <p className="text-white text-sm font-medium">John Doe</p>
+                    <p className="text-gray-500 text-xs">Member</p>
+                  </div>
+
+                  {/* links */}
+                  <div className="py-1">
+                    <Link
+                      to="/watchlist"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-gray-400
+              hover:text-white hover:bg-white/[0.05] transition-colors text-sm"
+                    >
+                      Watchlist
+                    </Link>
+                    <Link
+                      to="/recommend"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-gray-400
+              hover:text-white hover:bg-white/[0.05] transition-colors text-sm"
+                    >
+                      Recommendations
+                    </Link>
+                  </div>
+
+                  {/* logout */}
+                  <div className="border-t border-white/[0.06] py-1">
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setDropdownOpen(false);
+                      }}
+                      className="flex items-center gap-3 px-4 py-2.5 text-red-400
+              hover:text-red-300 hover:bg-red-500/[0.05] transition-colors
+              text-sm w-full text-left"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         ) : (
-          <Link
-            to="/login"
-            className="text-green-400 text-xs font-medium border border-green-500/25
-            bg-green-500/10 hover:bg-green-500/15 hover:border-green-500/50
-            px-4 py-1.5 rounded-lg transition-all flex-shrink-0"
-          >
-            Login
-          </Link>
+          <div className="relative">
+            <button
+              onClick={() => setLoginDropdown((p) => !p)}
+              className="text-green-400 text-xs font-medium border border-green-500/25
+      bg-green-500/10 hover:bg-green-500/15 hover:border-green-500/50
+      px-4 py-1.5 rounded-lg transition-all flex-shrink-0"
+            >
+              Login ▾
+            </button>
+
+            {loginDropdown && (
+              <>
+                {/* backdrop */}
+                <div
+                  className="fixed inset-0 z-30"
+                  onClick={() => setLoginDropdown(false)}
+                />
+                <div
+                  className="absolute top-10 right-0 z-40 flex gap-2 p-3
+          bg-[#0f0f14] border border-white/[0.08] rounded-xl shadow-2xl"
+                >
+                  {/* User Login */}
+                  <Link
+                    to="/login?type=user"
+                    onClick={() => setLoginDropdown(false)}
+                    className="flex flex-col items-center gap-2 px-5 py-3 rounded-lg
+            border border-green-500/25 bg-green-500/10
+            hover:bg-green-500/20 hover:border-green-500/50
+            text-green-400 transition-all group"
+                  >
+                    <span className="text-2xl group-hover:scale-110 transition-transform">
+                      👤
+                    </span>
+                    <span className="text-xs font-medium whitespace-nowrap">
+                      User Login
+                    </span>
+                  </Link>
+
+                  {/* Admin Login */}
+                  <Link
+                    to="/login?type=admin"
+                    onClick={() => setLoginDropdown(false)}
+                    className="flex flex-col items-center gap-2 px-5 py-3 rounded-lg
+            border border-green-500/25 bg-green-500/10
+            hover:bg-green-500/20 hover:border-green-500/50
+            text-green-400 transition-all group"
+                  >
+                    <span className="text-2xl group-hover:scale-110 transition-transform">
+                      🔐
+                    </span>
+                    <span className="text-xs font-medium whitespace-nowrap">
+                      Admin Login
+                    </span>
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
         )}
       </div>
     </div>

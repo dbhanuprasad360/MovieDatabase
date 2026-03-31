@@ -15,6 +15,8 @@ import ShowDetail from "./Components/ShowDetail";
 import PeopleDetail from "./Components/PeopleDetail";
 import Footer from "./Components/Footer";
 import Fun from "./Components/Fun";
+import SignUp from "./Components/SignUp";
+import AdminDashboard from "./Components/AdminDashboard";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -29,6 +31,7 @@ function ScrollToTop() {
 function App() {
   const [watchList, setwatchList] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const handleAddToWatchList = (movieobject) => {
     let updatedWatchList = [...watchList, movieobject];
@@ -72,6 +75,8 @@ function App() {
           watchList,
           isLoggedIn,
           setIsLoggedIn,
+          isAdmin,
+          setIsAdmin,
         }}
       >
         <BrowserRouter>
@@ -90,8 +95,10 @@ function App() {
                 path="/watchlist"
                 element={<Watchlist watchList={watchList} />}
               />
-              <Route path="/recommend" element={<Recommendation />} />
-              <Route path="/login" element={<Login />} /> */}
+              <Route path="/recommend" element={<Recommendation />} />*/}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/admin" element={<AdminDashboard />} />
 
               <Route path="/movie/:id" element={<MovieDetail />} />
               <Route path="/tv/:id" element={<ShowDetail />} />

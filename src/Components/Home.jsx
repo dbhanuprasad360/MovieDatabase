@@ -4,6 +4,78 @@ import axios from "axios";
 
 const API_KEY = import.meta.env.VITE_MOVIE_KEY;
 
+// HERO — shows a random trending movie as background
+function Hero({ movies }) {
+  const [current, setCurrent] = useState(0);
+
+  // auto rotate every 5 seconds
+  useEffect(() => {
+    if (!movies.length) return;
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % Math.min(movies.length, 5));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [movies]);
+
+  if (!movies.length) return null;
+
+  const movie = movies[current];
+  const backdrop = movie.backdrop_path
+    ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
+    : null;
+
+  return (
+    <div
+      className="relative w-full h-[70vh]  bg-cover bg-center transition-all duration-1000"
+      style={{ backgroundImage: backdrop ? `url(${backdrop})` : "none" }}
+    >
+      {/* gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+
+      {/* content */}
+      <div className="absolute bottom-16 left-8 max-w-lg">
+        <p className="text-green-400 text-xs font-semibold tracking-widest uppercase mb-2">
+          Trending Now
+        </p>
+        <h1 className="text-4xl font-black text-white mb-3 leading-tight">
+          {movie.title || movie.name}
+        </h1>
+        <p className="text-gray-300 text-sm leading-relaxed line-clamp-3 mb-5">
+          {movie.overview}
+        </p>
+        <div className="flex gap-3">
+          <Link
+            to={`/movie/${movie.id}`}
+            className="bg-green-500 hover:bg-green-600 text-white text-sm
+            font-semibold px-6 py-2.5 rounded-lg transition-colors"
+          >
+            View Details
+          </Link>
+          <span
+            className="flex items-center gap-1 text-yellow-400 text-sm
+            bg-black/40 px-4 py-2.5 rounded-lg border border-white/10"
+          >
+            ⭐ {movie.vote_average?.toFixed(1)}
+          </span>
+        </div>
+      </div>
+
+      {/* dot indicators */}
+      <div className="absolute bottom-6 left-8 flex gap-2">
+        {Array.from({ length: Math.min(movies.length, 5) }).map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={`h-1 rounded-full transition-all duration-300
+              ${i === current ? "w-6 bg-green-400" : "w-2 bg-white/30"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // reusable hook for fetching a single endpoint
 function useFetch(endpoint) {
   const [data, setData] = useState([]);
@@ -121,78 +193,6 @@ function Row({ title, items, type }) {
               {getLabel(item)}
             </p>
           </Link>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// HERO — shows a random trending movie as background
-function Hero({ movies }) {
-  const [current, setCurrent] = useState(0);
-
-  // auto rotate every 5 seconds
-  useEffect(() => {
-    if (!movies.length) return;
-    const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % Math.min(movies.length, 5));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [movies]);
-
-  if (!movies.length) return null;
-
-  const movie = movies[current];
-  const backdrop = movie.backdrop_path
-    ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
-    : null;
-
-  return (
-    <div
-      className="relative w-full h-[70vh]  bg-cover bg-center transition-all duration-1000"
-      style={{ backgroundImage: backdrop ? `url(${backdrop})` : "none" }}
-    >
-      {/* gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-
-      {/* content */}
-      <div className="absolute bottom-16 left-8 max-w-lg">
-        <p className="text-green-400 text-xs font-semibold tracking-widest uppercase mb-2">
-          Trending Now
-        </p>
-        <h1 className="text-4xl font-black text-white mb-3 leading-tight">
-          {movie.title || movie.name}
-        </h1>
-        <p className="text-gray-300 text-sm leading-relaxed line-clamp-3 mb-5">
-          {movie.overview}
-        </p>
-        <div className="flex gap-3">
-          <Link
-            to={`/movie/${movie.id}`}
-            className="bg-green-500 hover:bg-green-600 text-white text-sm
-            font-semibold px-6 py-2.5 rounded-lg transition-colors"
-          >
-            View Details
-          </Link>
-          <span
-            className="flex items-center gap-1 text-yellow-400 text-sm
-            bg-black/40 px-4 py-2.5 rounded-lg border border-white/10"
-          >
-            ⭐ {movie.vote_average?.toFixed(1)}
-          </span>
-        </div>
-      </div>
-
-      {/* dot indicators */}
-      <div className="absolute bottom-6 left-8 flex gap-2">
-        {Array.from({ length: Math.min(movies.length, 5) }).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrent(i)}
-            className={`h-1 rounded-full transition-all duration-300
-              ${i === current ? "w-6 bg-green-400" : "w-2 bg-white/30"}`}
-          />
         ))}
       </div>
     </div>
