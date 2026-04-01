@@ -86,12 +86,17 @@ function Hero({ movies }) {
 
       <button
         onClick={() => setTrailerMode((p) => !p)}
-        className="absolute top-4 right-4 z-30 flex items-center gap-2
-          bg-black/60 backdrop-blur-sm border border-white/20
-          text-gray-300 hover:text-white text-xs px-4 py-2 rounded-full
-          transition-all hover:border-white/40"
+        className={`absolute top-100 right-10 z-10 flex items-center gap-2
+    bg-green-500 hover:bg-green-600 text-white text-sm
+              font-semibold transition-colors px-4 py-2 rounded-full
+    hover:border-white/40
+    ${
+      trailerMode
+        ? "bg-red-600 hover:bg-red-500"
+        : "bg-green-500 hover:bg-green-600"
+    }`}
       >
-        {trailerMode ? "⏸ Pause Trailers" : "▶ Play Trailers"}
+        <span>{trailerMode ? "Pause" : "Play"}</span>
       </button>
 
       <div className="absolute inset-0 flex items-center">
@@ -133,7 +138,7 @@ function Hero({ movies }) {
           {trailerMode ? (
             <div
               className="w-full aspect-video rounded-xl overflow-hidden
-              shadow-[0_0_40px_rgba(0,0,0,0.8)] border border-white/10"
+              shadow-[0_0_40px_rgba(0,0,0,0.8)] border-1 border-white/20"
             >
               {loadingTrailer ? (
                 <div

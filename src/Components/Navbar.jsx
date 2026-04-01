@@ -42,28 +42,28 @@ function Navbar() {
         bg-gradient-to-b from-transparent via-green-500 to-transparent"
       />
 
-      {/* BRAND */}
-      <Link
-        to="/"
-        className="flex items-center gap-2 flex-shrink-0 mr-8 pl-[54px]"
-      >
-        <div
-          className="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600
+      {/* CENTER LINKS */}
+      <nav className="flex-1 flex  gap-1">
+        {/* BRAND */}
+        <Link
+          to="/"
+          className="flex items-center gap-2 flex-shrink-0 mr-8 pl-[54px]"
+        >
+          <div
+            className="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600
     rounded-lg flex items-center justify-center text-sm
     shadow-[0_0_12px_rgba(34,197,94,0.3)]"
-        >
-          🎬
-        </div>
-        <span
-          className="text-white font-black text-2xl tracking-[3px] leading-none"
-          style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-        >
-          CINE<span className="text-green-400">DB</span>
-        </span>
-      </Link>
+          >
+            🎬
+          </div>
+          <span
+            className="text-white font-black text-2xl tracking-[3px] leading-none"
+            style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+          >
+            CINE<span className="text-green-400">DB</span>
+          </span>
+        </Link>
 
-      {/* CENTER LINKS */}
-      <nav className="flex-1 flex items-center justify-center gap-1">
         {links.map(({ to, label }) => {
           // check if this link is active
           const isActive =
