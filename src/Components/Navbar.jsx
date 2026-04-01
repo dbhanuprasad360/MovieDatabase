@@ -3,11 +3,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { MovieContext } from "./MovieContext";
 
 function Navbar() {
-  const { isLoggedIn, setIsLoggedIn, isAdmin } = useContext(MovieContext);
+  const { isLoggedIn, setIsLoggedIn } = useContext(MovieContext);
   const navigate = useNavigate();
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [loginDropdown, setLoginDropdown] = useState(false);
   // useLocation tells us the current URL so we can highlight the active link
 
   function handleLogout() {
@@ -152,29 +151,22 @@ function Navbar() {
             {dropdownOpen && (
               <>
                 {/* invisible backdrop to close on outside click */}
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2.5 text-green-400
-    hover:text-green-300 hover:bg-green-500/[0.05] transition-colors text-sm"
-                  >
-                    <span>🔐</span> Admin Dashboard
-                  </Link>
-                )}
+
                 <div
                   className="absolute top-10 right-0 z-40 w-48
           bg-[#0f0f14] border border-white/[0.08] rounded-xl
           shadow-2xl overflow-hidden"
                 >
-                  {/* user info header */}
-                  <div className="px-4 py-3 border-b border-white/[0.06]">
-                    <p className="text-white text-sm font-medium">John Doe</p>
-                    <p className="text-gray-500 text-xs">Member</p>
-                  </div>
-
                   {/* links */}
                   <div className="py-1">
+                    <Link
+                      to="/admin"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-gray-400
+              hover:text-white hover:bg-white/[0.05] transition-colors text-sm"
+                    >
+                      Dashboard
+                    </Link>
                     <Link
                       to="/watchlist"
                       onClick={() => setDropdownOpen(false)}
@@ -213,62 +205,15 @@ function Navbar() {
           </div>
         ) : (
           <div className="relative">
-            <button
-              onClick={() => setLoginDropdown((p) => !p)}
-              className="text-green-400 text-xs font-medium border border-green-500/25
+            <Link to="/login?type=user">
+              <button
+                className="text-green-400 text-xs font-medium border border-green-500/25
       bg-green-500/10 hover:bg-green-500/15 hover:border-green-500/50
       px-4 py-1.5 rounded-lg transition-all flex-shrink-0"
-            >
-              Login ▾
-            </button>
-
-            {loginDropdown && (
-              <>
-                {/* backdrop */}
-                <div
-                  className="fixed inset-0 z-30"
-                  onClick={() => setLoginDropdown(false)}
-                />
-                <div
-                  className="absolute top-10 right-0 z-40 flex gap-2 p-3
-          bg-[#0f0f14] border border-white/[0.08] rounded-xl shadow-2xl"
-                >
-                  {/* User Login */}
-                  <Link
-                    to="/login?type=user"
-                    onClick={() => setLoginDropdown(false)}
-                    className="flex flex-col items-center gap-2 px-5 py-3 rounded-lg
-            border border-green-500/25 bg-green-500/10
-            hover:bg-green-500/20 hover:border-green-500/50
-            text-green-400 transition-all group"
-                  >
-                    <span className="text-2xl group-hover:scale-110 transition-transform">
-                      👤
-                    </span>
-                    <span className="text-xs font-medium whitespace-nowrap">
-                      User Login
-                    </span>
-                  </Link>
-
-                  {/* Admin Login */}
-                  <Link
-                    to="/login?type=admin"
-                    onClick={() => setLoginDropdown(false)}
-                    className="flex flex-col items-center gap-2 px-5 py-3 rounded-lg
-            border border-green-500/25 bg-green-500/10
-            hover:bg-green-500/20 hover:border-green-500/50
-            text-green-400 transition-all group"
-                  >
-                    <span className="text-2xl group-hover:scale-110 transition-transform">
-                      🔐
-                    </span>
-                    <span className="text-xs font-medium whitespace-nowrap">
-                      Admin Login
-                    </span>
-                  </Link>
-                </div>
-              </>
-            )}
+              >
+                Login
+              </button>
+            </Link>
           </div>
         )}
       </div>

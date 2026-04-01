@@ -5,18 +5,16 @@ import usePaginatedFetch from "../Hooks/usePaginatedFetch";
 import MediaCard from "./MediaCard";
 
 const categories = [
-  { title: "Upcoming Movies", endpoint: "movie/upcoming" },
-  { title: "Popular Movies", endpoint: "movie/popular" },
+  { title: "Popular", endpoint: "movie/popular" },
   { title: "Trending Today", endpoint: "trending/movie/day" },
-  { title: "Trending This Week", endpoint: "trending/movie/week" },
-  { title: "Top Rated Movies", endpoint: "movie/top_rated" },
+  { title: "This Week", endpoint: "trending/movie/week" },
+  { title: "Top Rated", endpoint: "movie/top_rated" },
   { title: "Now Playing", endpoint: "movie/now_playing" },
+  { title: "Upcoming", endpoint: "movie/upcoming" },
 ];
 
 const Movies = () => {
   const [categoryIndex, setCategoryIndex] = useState(0);
-  const [flip, setFlip] = useState(false);
-
   const currentCategory = categories[categoryIndex];
 
   const {
@@ -30,45 +28,55 @@ const Movies = () => {
     resetPages,
   } = usePaginatedFetch(currentCategory.endpoint);
 
-  function changeCategory() {
-    setFlip(true);
-
-    setTimeout(() => {
-      setCategoryIndex((prev) => (prev + 1) % categories.length);
-      resetPages();
-      setFlip(false);
-    }, 400);
+  function changeCategory(index) {
+    if (index === categoryIndex) return;
+    setCategoryIndex(index);
+    resetPages();
   }
 
   return (
     <div>
       <Banner />
-      <div className="w-full  mt-[58px]">
-        {/* SECTION TITLE */}
-        <div className="flex justify-center pt-10 mb-10">
-          <div
-            onClick={changeCategory}
-            className={`w-[300px] h-[80px] flex items-center justify-center
-          text-white text-3xl font-bold rounded-xl 
-          bg-gradient-to-r from-black via-gray-900 to-black
-          border border-gray-700 shadow-lg cursor-pointer
-          hover:border-green-500 hover:scale-105
-          transition-all blinkBorder duration-500
-          ${flip ? "sectionFlip" : ""}`}
+      <div className="w-full mt-[58px]">
+        {/* CATEGORY TABS — like Fun page */}
+        <div className="px-6 pt-8 pb-4">
+          <h1
+            className="text-3xl font-black tracking-wider text-white mb-6"
+            style={{ fontFamily: "'Bebas Neue', sans-serif" }}
           >
-            {currentCategory.title}
+            MOVIES
+          </h1>
+          <div className="flex flex-wrap gap-3 border-b border-white/[0.06] pb-4">
+            {categories.map(({ title }, index) => (
+              <button
+                key={title}
+                onClick={() => changeCategory(index)}
+                className={`px-5 py-2 rounded-lg text-sm font-medium border transition-all
+                  ${
+                    categoryIndex === index
+                      ? "bg-green-500 text-white border-green-500"
+                      : "border-white/20 text-gray-400 hover:border-green-500/40 hover:text-white"
+                  }`}
+              >
+                {title}
+              </button>
+            ))}
           </div>
         </div>
 
+        {/* LOADING */}
         {loading && (
-          <div className="text-white text-center mt-20 animate-pulse">
+          <div className="text-white text-center mt-20 animate-pulse text-lg">
             Loading...
           </div>
         )}
+
+        {/* ERROR */}
         {error && <div className="text-red-400 text-center mt-20">{error}</div>}
 
+        {/* MOVIES GRID */}
         {!loading && !error && (
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-3 px-6 mt-6">
             {movies.map((movieobj) => (
               <MediaCard key={movieobj.id} item={movieobj} type="movie" />
             ))}

@@ -1,21 +1,20 @@
-import React, { useEffect, useState, useContext } from "react";
-import Pagination from "./Pagination";
+import React, { useState } from "react";
 import Banner from "./Banner";
+import Pagination from "./Pagination";
 import usePaginatedFetch from "../Hooks/usePaginatedFetch";
 import MediaCard from "./MediaCard";
 
 const categories = [
-  { title: "Top Rated Shows", endpoint: "tv/top_rated" },
-  { title: "Popular Shows", endpoint: "tv/popular" },
-  { title: "Trending This Week", endpoint: "trending/tv/week" },
+  { title: "Popular", endpoint: "tv/popular" },
+  { title: "Trending Today", endpoint: "trending/tv/day" },
+  { title: "This Week", endpoint: "trending/tv/week" },
+  { title: "Top Rated", endpoint: "tv/top_rated" },
   { title: "On The Air", endpoint: "tv/on_the_air" },
   { title: "Airing Today", endpoint: "tv/airing_today" },
 ];
 
 const TvShows = () => {
   const [categoryIndex, setCategoryIndex] = useState(0);
-  const [flip, setFlip] = useState(false);
-
   const currentCategory = categories[categoryIndex];
 
   const {
@@ -29,45 +28,58 @@ const TvShows = () => {
     resetPages,
   } = usePaginatedFetch(currentCategory.endpoint);
 
-  function changeCategory() {
-    setFlip(true);
-
-    setTimeout(() => {
-      setCategoryIndex((prev) => (prev + 1) % categories.length);
-      resetPages(); // reset pagination
-      setFlip(false);
-    }, 300);
+  function changeCategory(index) {
+    if (index === categoryIndex) return;
+    setCategoryIndex(index);
+    resetPages();
   }
 
   return (
     <div>
       <Banner />
       <div className="w-full mt-[58px]">
-        {/* SECTION TITLE */}
-        <div className="flex justify-center pt-10 mb-10">
-          <div
-            onClick={changeCategory}
-            className={`w-[300px] h-[80px] flex items-center justify-center
-          text-white text-3xl font-bold rounded-xl relative 
-          bg-gradient-to-r from-black via-gray-900 to-black
-          border border-gray-700 shadow-lg cursor-pointer
-          hover:border-green-500 hover:scale-105
-          transition-all duration-500
-          ${flip ? "sectionFlip" : ""}`}
+        {/* CATEGORY TABS */}
+        <div className="px-6 pt-8 pb-4">
+          <h1
+            className="text-3xl font-black tracking-wider text-white mb-6"
+            style={{ fontFamily: "'Bebas Neue', sans-serif" }}
           >
-            {currentCategory.title}
+            TV SHOWS
+          </h1>
+          <div className="flex flex-wrap gap-3 border-b border-white/[0.06] pb-4">
+            {categories.map(({ title }, index) => (
+              <button
+                key={title}
+                onClick={() => changeCategory(index)}
+                className={`px-5 py-2 rounded-lg text-sm font-medium border transition-all
+                  ${
+                    categoryIndex === index
+                      ? "bg-green-500 text-white border-green-500"
+                      : "border-white/20 text-gray-400 hover:border-green-500/40 hover:text-white"
+                  }`}
+              >
+                {title}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* SHOWS GRID */}
-        <div className="flex flex-wrap justify-center gap-3">
-          {shows.map((showobj) => (
-            <MediaCard key={showobj.id} item={showobj} type="tv" />
-          ))}
-        </div>
+        {loading && (
+          <div className="text-white text-center mt-20 animate-pulse text-lg">
+            Loading...
+          </div>
+        )}
+        {error && <div className="text-red-400 text-center mt-20">{error}</div>}
 
-        {/* PAGINATION */}
-        <div className="flex justify-center mt-10">
+        {!loading && !error && (
+          <div className="flex flex-wrap justify-center gap-3 px-6 mt-6">
+            {shows.map((showobj) => (
+              <MediaCard key={showobj.id} item={showobj} type="tv" />
+            ))}
+          </div>
+        )}
+
+        <div className="flex justify-center mt-8">
           <Pagination
             prevFn={handleprevious}
             pageNumber={pages}

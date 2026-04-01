@@ -48,7 +48,7 @@ function Footer() {
               {[
                 { to: "/movies", label: "Movies" },
                 { to: "/tvshow", label: "TV Shows" },
-                { to: "/Actors", label: "Actors" },
+                { to: "/actors", label: "Actors" },
               ].map(({ to, label }) => (
                 <Link
                   key={to}
@@ -70,6 +70,7 @@ function Footer() {
               {[
                 { to: "/login", label: "Login" },
                 { to: "/signup", label: "Sign Up" },
+                { to: "/login?type=admin", label: "Admin login" },
               ].map(({ to, label }) => (
                 <Link
                   key={to}

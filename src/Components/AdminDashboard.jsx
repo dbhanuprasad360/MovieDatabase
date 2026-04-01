@@ -105,7 +105,6 @@ function AdminDashboard() {
         border-b border-white/[0.06] px-8 py-8"
       >
         <div className="flex items-center gap-3 mb-1">
-          <span className="text-2xl">🔐</span>
           <h1
             className="text-3xl font-black tracking-wider"
             style={{ fontFamily: "'Bebas Neue', sans-serif" }}
