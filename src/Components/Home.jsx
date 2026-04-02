@@ -9,7 +9,7 @@ const API_KEY = import.meta.env.VITE_MOVIE_KEY;
 function Hero({ movies }) {
   const [current, setCurrent] = useState(0);
   const [trailerKey, setTrailerKey] = useState(null);
-  const [trailerMode, setTrailerMode] = useState(true);
+  const [trailerMode, setTrailerMode] = useState(false);
   const [loadingTrailer, setLoadingTrailer] = useState(false);
   const timerRef = useRef(null);
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -29,7 +29,7 @@ function Hero({ movies }) {
 
     axios
       .get(
-        `https://api.themoviedb.org/3/movie/${movie.id}/videos?api_key=${API_KEY}`,
+        `https://api.themoviedb.org/3/${movie.mediaType}/${movie.id}/videos?api_key=${API_KEY}`,
       )
       .then((res) => {
         const trailer =
@@ -78,49 +78,44 @@ function Hero({ movies }) {
 
   return (
     <div
-      className="relative w-full h-[70vh] bg-cover bg-center transition-all duration-1000 overflow-hidden"
+      className="relative w-full h-[80vh] bg-cover bg-top transition-all duration-1000 overflow-hidden mt-[-62px] pt-[62px]"
       style={{ backgroundImage: backdrop ? `url(${backdrop})` : "none" }}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-black/30" />
       <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
-      <button
-        onClick={() => setTrailerMode((p) => !p)}
-        className={`absolute top-100 right-10 z-10 flex items-center gap-2
-    bg-green-500 hover:bg-green-600 text-white text-sm
-              font-semibold transition-colors px-4 py-2 rounded-full
-    hover:border-white/40
-    ${
-      trailerMode
-        ? "bg-red-600 hover:bg-red-500"
-        : "bg-green-500 hover:bg-green-600"
-    }`}
-      >
-        <span>{trailerMode ? "Pause" : "Play"}</span>
-      </button>
-
       <div className="absolute inset-0 flex items-center">
-        <div className="w-1/2 px-10 flex flex-col gap-4 z-10">
+        <div className="w-1/2 px-4 flex flex-col gap-4 z-10">
           <p className="text-green-400 text-xs font-semibold tracking-widest uppercase">
             🎬 Coming Soon
           </p>
           <h1 className="text-4xl font-black text-white leading-tight">
-            {movie.title}
+            {movie.displayTitle}{" "}
+            <span className=" gap-4 text-xs text-gray-400">
+              (
+              {movie.mediaType?.charAt(0).toUpperCase() +
+                movie.mediaType.slice(1)}
+              )
+            </span>
           </h1>
-          <div className="flex gap-4 text-xs text-gray-400">
-            <span>📅 {movie.release_date}</span>
+          <div className="flex gap-4  text-gray-400">
+            <span>📅 {movie.displayDate}</span>
             {movie.vote_average > 0 && (
               <span>⭐ {movie.vote_average?.toFixed(1)}</span>
             )}
           </div>
-          <p className="text-gray-300 text-sm leading-relaxed line-clamp-3">
+          <p className="text-gray-300 text-sm leading-relaxed line-clamp-5">
             {movie.overview}
           </p>
           <div className="flex gap-3">
             <Link
-              to={`/movie/${movie.id}`}
+              to={
+                movie.mediaType === "tv"
+                  ? `/tv/${movie.id}`
+                  : `/movie/${movie.id}`
+              }
               className="bg-green-500 hover:bg-green-600 text-white text-sm
-              font-semibold px-6 py-2.5 rounded-lg transition-colors"
+  font-semibold px-6 py-2.5 rounded-lg transition-colors"
             >
               View Details
             </Link>
@@ -130,11 +125,29 @@ function Hero({ movies }) {
               px-4 py-2.5 rounded-lg border border-white/20 transition-colors"
             >
               Next →
+            </button>{" "}
+            <button
+              onClick={() => {
+                setHasInteracted(true);
+                setTrailerMode((p) => !p);
+              }}
+              className={`z-10 
+    bg-green-500 hover:bg-green-600 
+               text-white text-sm
+  font-semibold px-6 py-2.5 rounded-lg transition-colors
+   
+    ${
+      trailerMode
+        ? "bg-red-600 hover:bg-red-500"
+        : "bg-green-500 hover:bg-green-600"
+    }`}
+            >
+              <span>{trailerMode ? "Pause Trailer" : "Play Trailer"}</span>
             </button>
           </div>
         </div>
 
-        <div className="w-1/2 px-8 z-10">
+        <div className="w-1/2 px-2 z-10">
           {trailerMode ? (
             <div
               className="w-full aspect-video rounded-xl overflow-hidden
@@ -150,7 +163,7 @@ function Hero({ movies }) {
               ) : trailerKey ? (
                 <iframe
                   key={trailerKey}
-                  src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&rel=0`}
+                  src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=${hasInteracted ? 0 : 1}&rel=0`}
                   title="Trailer"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media;"
                   allowFullScreen
@@ -254,7 +267,7 @@ function Row({ title, items, type }) {
   }
 
   return (
-    <div className="  pb-10">
+    <div className="pb-10">
       {/* ROW HEADER */}
       <div className="flex items-center justify-between px-6 mb-4">
         <h2 className="text-xl font-bold text-white tracking-wide">{title}</h2>
@@ -362,33 +375,75 @@ function Home() {
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10);
 
-    const baseUrl = `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`;
+    const movieUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&release_date.gte=${today}&sort_by=first_air_date.asc`;
+    const tvUrl = `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&first_air_date.gte=${today}&sort_by=first_air_date.asc`;
 
     Promise.all([
-      axios.get(`${baseUrl}&page=1`),
-      axios.get(`${baseUrl}&page=2`),
-      axios.get(`${baseUrl}&page=3`),
-      axios.get(`${baseUrl}&page=4`),
-      axios.get(`${baseUrl}&page=5`),
-      axios.get(`${baseUrl}&page=6`),
-      axios.get(`${baseUrl}&page=7`),
-      axios.get(`${baseUrl}&page=8`),
-      axios.get(`${baseUrl}&page=9`),
-      axios.get(`${baseUrl}&page=10`),
+      // movies — 6 pages
+      axios.get(`${movieUrl}&page=1`),
+      axios.get(`${movieUrl}&page=2`),
+      axios.get(`${movieUrl}&page=3`),
+      axios.get(`${movieUrl}&page=4`),
+      axios.get(`${movieUrl}&page=5`),
+      axios.get(`${movieUrl}&page=6`),
+
+      // tv shows — 4 pages
+      axios.get(`${tvUrl}&page=1`),
+      axios.get(`${tvUrl}&page=2`),
+      axios.get(`${tvUrl}&page=3`),
+      axios.get(`${tvUrl}&page=4`),
     ])
       .then((responses) => {
-        const allMovies = responses.flatMap((res) => res.data.results || []);
-        console.log("Total:", allMovies.length, "movies fetched");
-
-        const filtered = allMovies
-          .filter((m) => m.release_date && m.release_date >= today)
+        const allMovies = responses
+          .slice(0, 6)
+          .flatMap((res) => res.data.results || [])
+          .map((m) => ({
+            ...m,
+            mediaType: "movie",
+            displayTitle: m.title,
+            displayDate: m.release_date,
+          }))
+          .filter((m) => m.displayDate && m.displayDate >= today)
           .filter((m) => m.backdrop_path && m.poster_path && m.overview)
-          .filter((m) => m.popularity > 10)
+          .filter((m) => m.popularity > 5)
           .filter((m, i, self) => self.findIndex((x) => x.id === m.id) === i)
-          .sort((a, b) => new Date(a.release_date) - new Date(b.release_date))
-          .slice(0, 5);
+          .sort((a, b) => b.popularity - a.popularity)
+          .slice(0, 6); // ← top 7 movies
 
-        setUpcomingRaw(filtered);
+        const allShows = responses
+          .slice(6)
+          .flatMap((res) => res.data.results || [])
+          .map((s) => ({
+            ...s,
+            mediaType: "tv",
+            displayTitle: s.name,
+            displayDate: s.first_air_date,
+          }))
+          .filter((m) => m.displayDate && m.displayDate >= today)
+          .filter((m) => m.backdrop_path && m.poster_path && m.overview)
+          .filter((m) => m.popularity > 3)
+          .filter((m, i, self) => self.findIndex((x) => x.id === m.id) === i)
+          .sort((a, b) => b.popularity - a.popularity)
+          .slice(0, 4); // ← top 3 shows
+
+        const combined = [...allMovies, ...allShows]
+          // must be future release
+          .filter((m) => m.displayDate && m.displayDate >= today)
+          // must have images and overview for hero to look good
+          .filter((m) => m.backdrop_path && m.poster_path && m.overview)
+          // must be popular enough to have a trailer
+          .filter((m) => m.popularity > 4)
+          // remove duplicates
+          .filter((m, i, self) => self.findIndex((x) => x.id === m.id) === i)
+          // sort by nearest release date first
+          .sort((a, b) => b.popularity - a.popularity)
+          .slice(0, 10);
+
+        console.log("Movies fetched:", allMovies);
+        console.log("Shows fetched:", allShows);
+        console.log("Combined filtered:", combined);
+
+        setUpcomingRaw(combined);
       })
       .catch(console.log);
   }, []);
