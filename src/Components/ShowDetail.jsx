@@ -79,10 +79,10 @@ function ShowDetail() {
       {/* BACKDROP */}
       {backdrop && (
         <div
-          className="w-full h-[80vh] bg-cover bg-center relative"
+          className="w-full h-[85vh] bg-cover bg-center relative"
           style={{ backgroundImage: `url(${backdrop})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t backdrop-blur-[2px] from-black via-black/80 to-transparent" />
         </div>
       )}
 
@@ -97,18 +97,18 @@ function ShowDetail() {
 
       {/* MAIN CONTENT */}
       <div
-        className={`max-w-5xl mx-auto  ${backdrop ? "-mt-[30rem]" : "mt-[62px]"} px-6  relative z-10 pb-20`}
+        className={`max-w-5xl mx-auto px-6 ${backdrop ? "-mt-[32rem]" : "pt-[62px]"} relative z-10 pb-20`}
       >
         <div className="flex flex-col md:flex-row gap-8">
           {/* POSTER */}
           <img
             src={poster}
             alt={show.name}
-            className="w-48 md:w-64 border-1 rounded-xl shadow-2xl flex-shrink-0 mx-auto md:mx-0"
+            className="w-48 md:w-64 rounded-xl border border-white/20 shadow-2xl flex-shrink-0 mx-auto md:mx-0 object-cover"
           />
 
           {/* INFO */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col justify-center gap-4">
             <h1 className="text-4xl font-bold">{show.name}</h1>
 
             {/* GENRES */}
@@ -116,7 +116,7 @@ function ShowDetail() {
               {show.genres?.map((g) => (
                 <span
                   key={g.id}
-                  className="bg-white/10 border border-white/20 px-3 py-1 rounded-full text-sm"
+                  className="bg-white/10 border border-white/20 px-3 py-1 rounded-full font-semibold text-sm"
                 >
                   {g.name}
                 </span>

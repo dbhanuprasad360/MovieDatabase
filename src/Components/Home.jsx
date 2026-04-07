@@ -11,21 +11,28 @@ function Hero({ movies }) {
   const [trailerKey, setTrailerKey] = useState(null);
   const [trailerMode, setTrailerMode] = useState(false);
   const [loadingTrailer, setLoadingTrailer] = useState(false);
+  const [noTrailer, setNoTrailer] = useState(false);
   const timerRef = useRef(null);
+  const iframeRef = useRef(null);
   const [hasInteracted, setHasInteracted] = useState(false);
 
   const upcomingMovies = movies;
+
   function goNext() {
     setCurrent((prev) => (prev + 1) % (upcomingMovies.length || 1));
+    setNoTrailer(false); // Reset for next movie
   }
 
+  // Trailer fetching and error handling
   useEffect(() => {
     if (!upcomingMovies.length || !trailerMode) return;
+
     const movie = upcomingMovies[current];
     if (!movie) return;
 
     setTrailerKey(null);
     setLoadingTrailer(true);
+    setNoTrailer(false);
 
     axios
       .get(
@@ -36,37 +43,83 @@ function Hero({ movies }) {
           res.data.results.find(
             (v) => v.type === "Trailer" && v.site === "YouTube",
           ) || res.data.results.find((v) => v.site === "YouTube");
-        if (trailer) setTrailerKey(trailer.key);
-        else setTimeout(goNext, 3000); // no trailer — skip after 3s
+
+        if (trailer) {
+          setTrailerKey(trailer.key);
+        } else {
+          // No trailer available, show backdrop and message, auto-next after 5s
+          setNoTrailer(true);
+          timerRef.current = setTimeout(goNext, 5000);
+        }
       })
-      .catch(console.log)
+      .catch((err) => {
+        console.log("Trailer fetch error:", err);
+        setNoTrailer(true);
+        timerRef.current = setTimeout(goNext, 5000);
+      })
       .finally(() => setLoadingTrailer(false));
   }, [current, trailerMode, upcomingMovies]);
 
+  // Auto-next timer (non-trailer mode)
   useEffect(() => {
     if (trailerMode || !upcomingMovies.length) return;
+
     timerRef.current = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % upcomingMovies.length);
+      goNext();
     }, 8000);
-    return () => clearInterval(timerRef.current);
+    return () => clearTimeout(timerRef.current);
   }, [trailerMode, upcomingMovies]);
+
+  // YouTube end detection
+  useEffect(() => {
+    if (!trailerKey || !iframeRef.current) return;
+
+    const detectVideoEnd = () => {
+      // YouTube sends 'ended' event when video completes
+      clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(goNext, 2000);
+    };
+
+    // Listen for YouTube player events
+    const iframe = iframeRef.current;
+    iframe.onload = () => {
+      try {
+        const player = iframe.contentWindow.YT?.getPlayerByKey?.(trailerKey);
+        if (player) {
+          player.addEventListener("onStateChange", (state) => {
+            if (state.data === 0) {
+              detectVideoEnd();
+            }
+          });
+        }
+      } catch (e) {
+        // Fallback: fixed duration
+        timerRef.current = setTimeout(goNext, 180000);
+      }
+    };
+
+    return () => {
+      iframe.onload = null;
+    };
+  }, [trailerKey]);
+
+  // Cleanup timers
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   if (!movies.length)
     return (
-      <div
-        className="w-full h-[70vh] bg-black animate-pulse flex items-center
-      justify-center text-gray-700 text-sm"
-      >
+      <div className="w-full h-[70vh] bg-black animate-pulse flex items-center justify-center text-gray-700 text-sm">
         Loading...
       </div>
     );
 
   if (!upcomingMovies.length)
     return (
-      <div
-        className="w-full h-[70vh] bg-black flex items-center
-      justify-center text-gray-600 text-sm"
-      >
+      <div className="w-full h-[70vh] bg-black flex items-center justify-center text-gray-600 text-sm">
         No upcoming movies found.
       </div>
     );
@@ -74,6 +127,11 @@ function Hero({ movies }) {
   const movie = upcomingMovies[current];
   const backdrop = movie.backdrop_path
     ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
+    : null;
+
+  // YouTube URL with subtitles and autoplay
+  const youtubeUrl = trailerKey
+    ? `https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=${hasInteracted ? 0 : 1}&rel=0&cc_load_policy=1&cc_lang_pref=en&playsinline=1&iv_load_policy=3&modestbranding=1&controls=1&fs=1`
     : null;
 
   return (
@@ -91,14 +149,14 @@ function Hero({ movies }) {
           </p>
           <h1 className="text-4xl font-black text-white leading-tight">
             {movie.displayTitle}{" "}
-            <span className=" gap-4 text-xs text-gray-400">
+            <span className="gap-4 text-xs text-gray-400">
               (
               {movie.mediaType?.charAt(0).toUpperCase() +
                 movie.mediaType.slice(1)}
               )
             </span>
           </h1>
-          <div className="flex gap-4  text-gray-400">
+          <div className="flex gap-4 text-gray-400">
             <span>📅 {movie.displayDate}</span>
             {movie.vote_average > 0 && (
               <span>⭐ {movie.vote_average?.toFixed(1)}</span>
@@ -114,88 +172,79 @@ function Hero({ movies }) {
                   ? `/tv/${movie.id}`
                   : `/movie/${movie.id}`
               }
-              className="bg-green-500 hover:bg-green-600 text-white text-sm
-  font-semibold px-6 py-2.5 rounded-lg transition-colors"
+              className="bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors"
             >
               View Details
             </Link>
             <button
               onClick={goNext}
-              className="bg-black/50 hover:bg-black/70 text-white text-sm
-              px-4 py-2.5 rounded-lg border border-white/20 transition-colors"
+              className="bg-black/50 hover:bg-black/70 text-white text-sm px-4 py-2.5 rounded-lg border border-white/20 transition-colors"
             >
               Next →
-            </button>{" "}
+            </button>
             <button
               onClick={() => {
                 setHasInteracted(true);
                 setTrailerMode((p) => !p);
               }}
-              className={`z-10 
-    bg-green-500 hover:bg-green-600 
-               text-white text-sm
-  font-semibold px-6 py-2.5 rounded-lg transition-colors
-   
-    ${
-      trailerMode
-        ? "bg-red-600 hover:bg-red-500"
-        : "bg-green-500 hover:bg-green-600"
-    }`}
+              className={`text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors ${
+                trailerMode
+                  ? "bg-red-600 hover:bg-red-500"
+                  : "bg-green-500 hover:bg-green-600"
+              }`}
             >
               <span>{trailerMode ? "Pause Trailer" : "Play Trailer"}</span>
             </button>
           </div>
         </div>
 
+        {/* Video player section */}
         <div className="w-1/2 px-2 z-10">
           {trailerMode ? (
-            <div
-              className="w-full aspect-video rounded-xl overflow-hidden
-              shadow-[0_0_40px_rgba(0,0,0,0.8)] border-1 border-white/20"
-            >
+            <div className="w-full aspect-video rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.8)] border border-white/20">
               {loadingTrailer ? (
-                <div
-                  className="w-full h-full bg-black/50 flex items-center
-                  justify-center text-gray-500 animate-pulse text-sm"
-                >
+                <div className="w-full h-full bg-black/50 flex items-center justify-center text-gray-500 animate-pulse text-sm">
                   Loading trailer...
                 </div>
-              ) : trailerKey ? (
+              ) : trailerKey && !noTrailer ? (
+                // YouTube with subtitles enabled
                 <iframe
-                  key={trailerKey}
-                  src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=${hasInteracted ? 0 : 1}&rel=0`}
-                  title="Trailer"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media;"
+                  ref={iframeRef}
+                  src={youtubeUrl}
+                  title={`Trailer for ${movie.displayTitle}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="w-full h-full"
-                  ref={(el) => {
-                    if (el) {
-                      clearTimeout(timerRef.current);
-                      timerRef.current = setTimeout(goNext, 150000);
-                    }
-                  }}
                 />
               ) : (
-                <div
-                  className="w-full h-full bg-black/50 flex flex-col
-                  items-center justify-center gap-2 text-gray-500"
-                >
-                  <span className="text-3xl">🎬</span>
-                  <span className="text-sm">No trailer available</span>
+                // No trailer available, show backdrop and message
+                <div className="w-full h-full bg-black/30 flex flex-col items-center justify-center gap-4 text-gray-400 relative overflow-hidden rounded-xl">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center opacity-50"
+                    style={{ backgroundImage: `url(${backdrop})` }}
+                  />
+                  <div className="relative z-10 flex flex-col items-center gap-3 text-center px-4">
+                    <span className="text-4xl">🎬</span>
+                    <h3 className="text-lg font-semibold text-white">
+                      Trailer Not Available
+                    </h3>
+                    <p className="text-sm">
+                      Moving to next in{" "}
+                      <span className="text-green-400 font-bold">5s</span>...
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
           ) : (
-            <div
-              className="w-full aspect-video rounded-xl overflow-hidden
-              shadow-[0_0_40px_rgba(0,0,0,0.8)] border border-white/10"
-            >
+            // Poster image
+            <div className="w-full aspect-video rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.8)] border border-white/10">
               <img
                 src={
                   backdrop ||
                   "https://via.placeholder.com/640x360?text=No+Image"
                 }
-                alt={movie.title}
+                alt={movie.displayTitle}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -203,19 +252,22 @@ function Hero({ movies }) {
         </div>
       </div>
 
+      {/* Dot navigation */}
       <div className="absolute bottom-6 left-10 flex gap-2 z-20">
         {upcomingMovies.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            className={`h-1 rounded-full transition-all duration-300
-              ${i === current ? "w-6 bg-green-400" : "w-2 bg-white/30"}`}
+            className={`h-1 rounded-full transition-all duration-300 ${
+              i === current ? "w-6 bg-green-400" : "w-2 bg-white/30"
+            }`}
           />
         ))}
       </div>
     </div>
   );
 }
+
 // reusable hook for fetching a single endpoint
 function useFetch(endpoint) {
   const [data, setData] = useState([]);

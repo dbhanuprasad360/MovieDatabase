@@ -36,8 +36,8 @@ const TvShows = () => {
 
   return (
     <div>
-      <Banner />
-      <div className="w-full mt-[58px]">
+      {/* <Banner /> */}
+      <div className="w-full bg-black mt-[58px]">
         {/* CATEGORY TABS */}
         <div className="px-6 pt-8 pb-4">
           <h1

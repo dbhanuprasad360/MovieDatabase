@@ -5,12 +5,7 @@ import { Link } from "react-router-dom";
 
 function MovieDetail() {
   const { id } = useParams();
-  // useParams reads the :id from the URL
-  // so if URL is /movie/550, id = "550"
-
   const navigate = useNavigate();
-  // useNavigate lets us go back programmatically
-
   const [movie, setMovie] = useState(null);
   const [cast, setCast] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +14,6 @@ function MovieDetail() {
   const API_KEY = import.meta.env.VITE_MOVIE_KEY;
 
   useEffect(() => {
-    // Promise.all — fetch movie details AND cast at the same time
     Promise.all([
       axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`),
       axios.get(
@@ -27,36 +21,28 @@ function MovieDetail() {
       ),
       axios.get(
         `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`,
-      ), // ← add this
+      ),
     ])
       .then(([movieRes, creditsRes, videosRes]) => {
         setMovie(movieRes.data);
         setCast(creditsRes.data.cast.slice(0, 8));
-
-        // find the official trailer from youtube
         const videos = videosRes.data.results;
         const officialTrailer =
           videos.find((v) => v.type === "Trailer" && v.site === "YouTube") ||
-          videos.find(
-            (v) => v.site === "YouTube", // fallback to any youtube video
-          );
+          videos.find((v) => v.site === "YouTube");
         if (officialTrailer) setTrailer(officialTrailer.key);
-        // key is the YouTube video ID like "dQw4w9WgXcQ"
       })
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
   }, [id]);
-  // runs every time id changes — so navigating from one movie to another re-fetches
 
-  // show loading screen while fetching
   if (loading)
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-black text-white text-2xl animate-pulse">
+      <div className="w-full h-screen flex items-center justify-center bg-black text-white text-2xl">
         Loading...
       </div>
     );
 
-  // show error if movie not found
   if (!movie)
     return (
       <div className="w-full h-screen flex items-center justify-center bg-black text-white">
@@ -74,14 +60,16 @@ function MovieDetail() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* BACKDROP IMAGE — full width banner at top */}
+      {/* BACKDROP */}
       {backdrop && (
         <div
-          className="w-full h-[90vh] bg-cover bg-center relative"
+          className="w-full h-[85vh] bg-cover bg-center relative"
           style={{ backgroundImage: `url(${backdrop})` }}
         >
-          {/* dark gradient so text below is readable */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
+          <div
+            className="absolute inset-0 bg-gradient-to-t backdrop-blur-[2px]
+            from-black via-black/80 to-transparent"
+          />
         </div>
       )}
 
@@ -96,47 +84,48 @@ function MovieDetail() {
 
       {/* MAIN CONTENT */}
       <div
-        className={`max-w-5xl mx-auto  ${backdrop ? "-mt-[35rem]" : "mt-[62px]"} relative z-10 pb-20"`}
+        className={`max-w-5xl mx-auto px-6
+        ${backdrop ? "-mt-[32rem]" : "pt-[62px]"}
+        relative z-10 pb-20`}
       >
         <div className="flex flex-col md:flex-row gap-8">
           {/* POSTER */}
           <img
             src={poster}
             alt={movie.title}
-            className="w-48 md:w-72 rounded-xl shadow-2xl flex-shrink-0 mx-auto md:mx-0 object-cover"
+            className="w-48 md:w-64 rounded-xl border border-white/20
+            shadow-2xl flex-shrink-0 mx-auto md:mx-0 object-cover"
           />
 
           {/* INFO */}
-          <div className="flex flex-col pt-40 gap-4">
+          <div className="flex flex-col justify-center gap-4">
             <h1 className="text-4xl font-bold">{movie.title}</h1>
 
-            {/* GENRES — mapped from array */}
             <div className="flex flex-wrap gap-2">
               {movie.genres?.map((g) => (
                 <span
                   key={g.id}
-                  className="bg-white/10 border border-white/20 px-3 py-1 rounded-full text-sm"
+                  className="bg-white/10 border border-white/20
+                  px-3 py-1 rounded-full text-sm"
                 >
                   {g.name}
                 </span>
               ))}
             </div>
 
-            {/* STATS */}
             <div className="flex gap-6 text-sm text-gray-400">
               <span>⭐ {movie.vote_average?.toFixed(1)}</span>
               <span>🕐 {movie.runtime} min</span>
               <span>📅 {movie.release_date}</span>
             </div>
 
-            {/* DESCRIPTION */}
             <p className="text-gray-300 leading-relaxed">{movie.overview}</p>
           </div>
         </div>
 
-        {/* CAST SECTION */}
+        {/* CAST */}
         {cast.length > 0 && (
-          <div className="mt-12 pb-10">
+          <div className="mt-12 pb-12">
             <h2 className="text-2xl font-bold mb-4">Cast</h2>
             <div className="flex flex-wrap gap-4">
               {cast.map((member) => (
@@ -149,7 +138,8 @@ function MovieDetail() {
                           : "https://via.placeholder.com/80x80?text=?"
                       }
                       alt={member.name}
-                      className="w-36 h-48 rounded-lg object-cover mx-auto mb-2 border-2 border-white/20"
+                      className="w-36 h-48 rounded-lg object-cover mx-auto mb-2
+                      border-2 border-white/20"
                     />
                     <p className="text-sm text-gray-300 leading-tight">
                       {member.name}
@@ -157,7 +147,6 @@ function MovieDetail() {
                     <p className="text-xs text-gray-500 mt-1">
                       {member.character}
                     </p>
-                    {/* ↑ shows the character name they played */}
                   </div>
                 </Link>
               ))}
@@ -165,11 +154,11 @@ function MovieDetail() {
           </div>
         )}
 
-        {/* TRAILER SECTION */}
+        {/* TRAILER */}
         {trailer && (
-          <div className="p-12">
+          <div className="mt-12">
             <h2 className="text-2xl font-bold mb-4">🎬 Trailer</h2>
-            <div className="relative w-[60vw] aspect-video rounded-xl overflow-hidden shadow-2xl">
+            <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl">
               <iframe
                 src={`https://www.youtube.com/embed/${trailer}?autoplay=0&rel=0`}
                 title="Trailer"
