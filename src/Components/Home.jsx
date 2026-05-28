@@ -182,32 +182,24 @@ function Hero({ movies }) {
             >
               Next →
             </button>
-            <button
-              onClick={() => {
-                setHasInteracted(true);
-                setTrailerMode((p) => !p);
-              }}
-              className={`text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors ${
-                trailerMode
-                  ? "bg-red-600 hover:bg-red-500"
-                  : "bg-green-500 hover:bg-green-600"
-              }`}
-            >
-              <span>{trailerMode ? "Pause Trailer" : "Play Trailer"}</span>
-            </button>
           </div>
         </div>
 
         {/* Video player section */}
         <div className="w-1/2 px-2 z-10">
           {trailerMode ? (
-            <div className="w-full aspect-video rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.8)] border border-white/20">
+            <div
+              className="w-full aspect-video rounded-xl overflow-hidden
+      shadow-[0_0_40px_rgba(0,0,0,0.8)] border border-white/20 relative"
+            >
               {loadingTrailer ? (
-                <div className="w-full h-full bg-black/50 flex items-center justify-center text-gray-500 animate-pulse text-sm">
+                <div
+                  className="w-full h-full bg-black/50 flex items-center
+          justify-center text-gray-500 animate-pulse text-sm"
+                >
                   Loading trailer...
                 </div>
               ) : trailerKey && !noTrailer ? (
-                // YouTube with subtitles enabled
                 <iframe
                   ref={iframeRef}
                   src={youtubeUrl}
@@ -217,8 +209,10 @@ function Hero({ movies }) {
                   className="w-full h-full"
                 />
               ) : (
-                // No trailer available, show backdrop and message
-                <div className="w-full h-full bg-black/30 flex flex-col items-center justify-center gap-4 text-gray-400 relative overflow-hidden rounded-xl">
+                <div
+                  className="w-full h-full bg-black/30 flex flex-col items-center
+          justify-center gap-4 text-gray-400 relative overflow-hidden rounded-xl"
+                >
                   <div
                     className="absolute inset-0 bg-cover bg-center opacity-50"
                     style={{ backgroundImage: `url(${backdrop})` }}
@@ -235,10 +229,24 @@ function Hero({ movies }) {
                   </div>
                 </div>
               )}
+
+              {/* BUTTON — bottom left of trailer ✅ */}
+              <button
+                onClick={() => {
+                  setHasInteracted(true);
+                  setTrailerMode((p) => !p);
+                }}
+                className="absolute bottom-3 left-3 z-20 px-3 py-3 font-semibold
+           rounded-2xl border-1 border-black transition-colors  bg-red-600 hover:bg-red-500"
+              >
+                Stop
+              </button>
             </div>
           ) : (
-            // Poster image
-            <div className="w-full aspect-video rounded-xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.8)] border border-white/10">
+            <div
+              className="w-full aspect-video rounded-xl overflow-hidden
+      shadow-[0_0_40px_rgba(0,0,0,0.8)] border border-white/10 relative"
+            >
               <img
                 src={
                   backdrop ||
@@ -247,6 +255,18 @@ function Hero({ movies }) {
                 alt={movie.displayTitle}
                 className="w-full h-full object-cover"
               />
+
+              {/* BUTTON — bottom left of poster ✅ */}
+              <button
+                onClick={() => {
+                  setHasInteracted(true);
+                  setTrailerMode((p) => !p);
+                }}
+                className="absolute bottom-3 left-3 z-20  font-semibold px-3 py-3
+           rounded-2xl border-1 border-black transition-colors bg-green-500 hover:bg-green-600"
+              >
+                Play
+              </button>
             </div>
           )}
         </div>
