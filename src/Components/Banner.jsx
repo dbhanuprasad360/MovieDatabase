@@ -135,12 +135,12 @@ function Hero({ movies }) {
           </p>
           <h1 className="text-4xl font-black text-white leading-tight">
             {movie.displayTitle}{" "}
-            <span className="text-xs text-gray-400">
+            {/* <span className="text-xs text-gray-400">
               (
               {movie.mediaType?.charAt(0).toUpperCase() +
                 movie.mediaType?.slice(1)}
               )
-            </span>
+            </span> */}
           </h1>
           <div className="flex gap-4 text-gray-400">
             <span>📅 {movie.displayDate}</span>
@@ -259,7 +259,7 @@ function Hero({ movies }) {
       </div>
 
       {/* DOTS */}
-      <div className="absolute bottom-6 left-10 flex gap-2 z-20">
+      <div className="absolute bottom-6 left-10 flex gap-2 z-10">
         {upcomingMovies.map((_, i) => (
           <button
             key={i}
