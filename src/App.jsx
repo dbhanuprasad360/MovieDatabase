@@ -17,7 +17,7 @@ import Fun from "./Components/Fun";
 import SignUp from "./Components/SignUp";
 import AdminDashboard from "./Components/AdminDashboard";
 import { WatchlistProvider } from "./Hooks/useWatchlist";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
