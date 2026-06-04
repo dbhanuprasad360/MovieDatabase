@@ -70,7 +70,7 @@ function Footer() {
               {[
                 { to: "/login", label: "Login" },
                 { to: "/signup", label: "Sign Up" },
-                { to: "/login?type=admin", label: "Admin login" },
+                { to: "/login?type=admin", label: "Admin Login" },
               ].map(({ to, label }) => (
                 <Link
                   key={to}
@@ -92,9 +92,7 @@ function Footer() {
           <p className="text-gray-600 text-xs">
             © {new Date().getFullYear()} CineDB. All rights reserved.
           </p>
-          <p className="text-gray-700 text-xs">
-            Built with React + Vite + Tailwind + TMDB API
-          </p>
+          <p className="text-gray-700 text-xs">Built with Vite + Claude AI</p>
         </div>
       </div>
     </footer>

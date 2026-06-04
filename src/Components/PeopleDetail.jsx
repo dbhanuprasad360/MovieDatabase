@@ -487,7 +487,7 @@ function PeopleDetail() {
                       months += 12;
                     }
                     return (
-                      <span className="text-gray-500">
+                      <span className="text-white">
                         ({years}y {months}m)
                       </span>
                     );

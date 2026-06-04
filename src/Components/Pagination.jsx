@@ -2,22 +2,21 @@ function Pagination({ pageNumber, nextFn, prevFn, goToPage }) {
   function getPageNumbers() {
     const pages = [];
 
-    if (pageNumber <= 4) {
-      for (let i = 1; i <= Math.min(5, pageNumber + 2); i++) {
-        pages.push(i);
-      }
-      pages.push("...");
-      pages.push(10);
-    } else {
+    if (pageNumber === 1) {
+      // on page 1 — just show 1 and 2
       pages.push(1);
-      pages.push("...");
-      for (let i = pageNumber - 1; i <= pageNumber + 1; i++) {
-        pages.push(i);
+      pages.push(2);
+    } else {
+      // always show 1 as home option if we're past page 2
+      if (pageNumber > 2) {
+        pages.push(1);
+        if (pageNumber > 3) pages.push("...");
       }
-      pages.push("...");
-      pages.push(pageNumber + 3);
+      // previous, current, next
+      pages.push(pageNumber - 1);
+      pages.push(pageNumber);
+      pages.push(pageNumber + 1);
     }
-
     return pages;
   }
 
