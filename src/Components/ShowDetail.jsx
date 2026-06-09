@@ -82,7 +82,7 @@ function ShowDetail() {
           className="w-full h-[85vh] bg-cover bg-center relative"
           style={{ backgroundImage: `url(${backdrop})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t backdrop-blur-[2px] from-black via-black/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t  from-black via-black/80 to-transparent" />
         </div>
       )}
 

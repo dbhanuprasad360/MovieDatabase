@@ -168,7 +168,7 @@ function Hero({ movies }) {
               className="bg-black/50 hover:bg-black/70 text-white text-sm
               px-4 py-2.5 rounded-lg border border-white/20 transition-colors"
             >
-              Next →
+              Next
             </button>
           </div>
         </div>

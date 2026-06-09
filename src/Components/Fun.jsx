@@ -6,7 +6,7 @@ const API_KEY = import.meta.env.VITE_MOVIE_KEY;
 
 // TMDB's highest known movie id is around 1000000
 // but valid movies are scattered — we try random ids until one works
-const MAX_MOVIE_ID = 900000;
+const MAX_MOVIE_ID = 300000;
 
 const GENRES = [
   { id: 28, name: "Action" },
@@ -32,15 +32,18 @@ function RandomTrailer() {
 
     // keep trying random ids until we find one with a trailer
     let found = false;
-    while (!found) {
+    let attempts = 0;
+    while (!found && attempts < 100) {
+      // ← max 50 attempts to avoid infinite loop
+      attempts++;
       const randomId = Math.floor(Math.random() * MAX_MOVIE_ID) + 1;
       try {
         const [movieRes, videoRes] = await Promise.all([
           axios.get(
-            `https://api.themoviedb.org/3/movie/${randomId}?api_key=${API_KEY}`,
+            `https://api.themoviedb.org/3/movie/${randomId}?api_key=${API_KEY}&include_adult=false`,
           ),
           axios.get(
-            `https://api.themoviedb.org/3/movie/${randomId}/videos?api_key=${API_KEY}`,
+            `https://api.themoviedb.org/3/movie/${randomId}/videos?api_key=${API_KEY}&include_adult=false`,
           ),
         ]);
 
@@ -49,7 +52,13 @@ function RandomTrailer() {
           (v) => v.type === "Trailer" && v.site === "YouTube",
         );
 
-        if (trailer && movieRes.data.title) {
+        if (
+          trailer &&
+          movieRes.data.title &&
+          !movieRes.data.adult &&
+          movieRes.data.vote_count > 10 &&
+          movieRes.data.popularity > 2
+        ) {
           setMovie(movieRes.data);
           setTrailer(trailer.key);
           found = true;
@@ -109,7 +118,7 @@ function RandomTrailer() {
               className="bg-green-500/10 border border-green-500/30 text-green-400
               text-xs font-medium px-4 py-2 rounded-lg hover:bg-green-500/20 transition-colors"
             >
-              View Details →
+              View Details
             </Link>
           </div>
 
@@ -143,21 +152,31 @@ function RandomPick() {
     setResult(null);
 
     let found = false;
-    while (!found) {
+    let attempts = 0;
+
+    while (!found && attempts < 100) {
+      attempts++;
       const randomId = Math.floor(Math.random() * MAX_MOVIE_ID) + 1;
       try {
         const res = await axios.get(
-          `https://api.themoviedb.org/3/${mediaType}/${randomId}?api_key=${API_KEY}`,
+          `https://api.themoviedb.org/3/${mediaType}/${randomId}?api_key=${API_KEY}&include_adult=false`,
         );
         const item = res.data;
         // make sure it has a poster and a title/name
-        if (item.poster_path && (item.title || item.name)) {
+        if (
+          item.poster_path &&
+          (item.title || item.name) &&
+          !item.adult &&
+          item.vote_count > 10 &&
+          item.popularity > 2
+        ) {
           setResult(item);
           found = true;
         }
       } catch {
-        // id doesn't exist, try another
+        console.log(randomId + " does not exist"); // id doesn't exist, try another
       }
+      console.log(randomId);
     }
     setLoading(false);
   }
@@ -308,7 +327,7 @@ function SpinWheel() {
     setRefreshing(true);
     try {
       const res = await axios.get(
-        `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genre.id}&sort_by=trending.desc`,
+        `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genre.id}&sort_by=trending.desc&include_adult=false`,
       );
       // only NOW swap out what's shown — no empty-panel flash
       setDisplayGenre(genre);

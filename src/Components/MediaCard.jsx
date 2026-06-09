@@ -1,14 +1,14 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { MovieContext } from "./MovieContext";
-import { useWatchlist } from "../Hooks/useWatchlist"; // ← Add this
+//import { useWatchlist } from "../Hooks/useWatchlist"; // ← Add this
 
 function MediaCard({ item, type }) {
   const { isLoggedIn } = useContext(MovieContext);
-  const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
+  //  const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
 
   // ✅ Check BOTH id AND mediaType
-  const inWatchlist = isInWatchlist(item?.id, type);
+  //  const inWatchlist = isInWatchlist(item?.id, type);
 
   const imagePath = type === "person" ? item?.profile_path : item?.poster_path;
   const poster = imagePath
@@ -29,16 +29,16 @@ function MediaCard({ item, type }) {
         : `/person/${item?.id}`;
 
   // ✅ Single handler with stopPropagation
-  const handleHeartClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation(); // Prevents Link navigation
+  // const handleHeartClick = (e) => {
+  //   e.preventDefault();
+  //   e.stopPropagation(); // Prevents Link navigation
 
-    if (inWatchlist) {
-      removeFromWatchlist(item.id, type);
-    } else {
-      addToWatchlist(item, type);
-    }
-  };
+  //   if (inWatchlist) {
+  //     removeFromWatchlist(item.id, type);
+  //   } else {
+  //     addToWatchlist(item, type);
+  //   }
+  // };
 
   return (
     <div className="m-1 flex flex-col max-w-36 w-full">
@@ -49,7 +49,7 @@ function MediaCard({ item, type }) {
           style={{ backgroundImage: `url(${poster})` }}
         >
           {/* ✅ Simplified heart with conditional styling */}
-          <div
+          {/* <div
             className="absolute top-2 right-2 p-2 z-10 cursor-pointer"
             onClick={handleHeartClick}
           >
@@ -60,7 +60,7 @@ function MediaCard({ item, type }) {
                   : "fa-regular text-white hover:text-red-400"
               }`}
             />
-          </div>
+          </div> */}
         </div>
 
         <h5 className="text-white text-center font-bold mt-2 text-sm leading-tight line-clamp-2 px-1">

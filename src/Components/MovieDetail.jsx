@@ -67,7 +67,7 @@ function MovieDetail() {
           style={{ backgroundImage: `url(${backdrop})` }}
         >
           <div
-            className="absolute inset-0 bg-gradient-to-t backdrop-blur-[2px]
+            className="absolute inset-0 bg-gradient-to-t 
             from-black via-black/80 to-transparent"
           />
         </div>
