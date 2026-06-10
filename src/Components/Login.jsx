@@ -54,12 +54,12 @@ function Login() {
 
       {/* Card */}
       <div
-        className="relative z-10 w-full max-w-md mx-4 bg-gray-900/90
+        className="relative z-10 w-full max-w-md mx-4 bg-gray-900/50
         backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-white/[0.08]"
       >
         {/* Header */}
 
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <div
               className="w-9 h-9 bg-gradient-to-br from-green-400 to-green-600
@@ -106,7 +106,7 @@ function Login() {
                 setErrors((prev) => ({ ...prev, username: "" }));
               }}
               placeholder="Enter your username"
-              className={`w-full p-3 rounded-lg bg-white/[0.06] text-white
+              className={`w-full p-2 rounded-lg bg-white/[0.06] text-white
                 border transition-colors outline-none placeholder-gray-600
                 focus:border-green-500/60 focus:bg-white/[0.08]
                 ${errors.username ? "border-red-500/60" : "border-white/[0.1]"}`}
@@ -130,7 +130,7 @@ function Login() {
                   setErrors((prev) => ({ ...prev, password: "" }));
                 }}
                 placeholder="Enter your password"
-                className={`w-full p-3 pr-12 rounded-lg bg-white/[0.06] text-white
+                className={`w-full p-2 pr-12 rounded-lg bg-white/[0.06] text-white
                   border transition-colors outline-none placeholder-gray-600
                   focus:border-green-500/60 focus:bg-white/[0.08]
                   ${errors.password ? "border-red-500/60" : "border-white/[0.1]"}`}
